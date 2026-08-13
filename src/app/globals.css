@@ -1,26 +1,152 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+
+  --color-ivory: #faf7f1;
+  --color-cream: #f4eee3;
+  --color-sand: #eadfca;
+  --color-clay: #d9c6aa;
+  --color-taupe: #a99c87;
+  --color-charcoal: #262219;
+  --color-ink: #17140e;
+  --color-gold: #af8c50;
+  --color-gold-soft: #cdb585;
+  --color-gold-deep: #8a6b37;
+  --color-blush: #f0e3dd;
+  --color-mist: #8f8574;
+
+  --shadow-soft: 0 1px 2px rgb(38 34 25 / 0.04), 0 8px 24px rgb(38 34 25 / 0.06);
+  --shadow-lifted: 0 2px 4px rgb(38 34 25 / 0.05), 0 20px 48px rgb(38 34 25 / 0.12);
+  --shadow-card: 0 1px 2px rgb(38 34 25 / 0.03), 0 12px 32px rgb(38 34 25 / 0.1);
+
+  --tracking-widest2: 0.28em;
+  --tracking-widest3: 0.4em;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-sand);
+  color: var(--color-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ivory);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-clay);
+  border: 2px solid var(--color-ivory);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-taupe);
+}
+
+/* ---------- Custom utilities ---------- */
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility hairline-t {
+  border-top: 1px solid var(--color-clay);
+}
+@utility hairline-b {
+  border-bottom: 1px solid var(--color-clay);
+}
+
+@utility bg-noise {
+  position: relative;
+}
+
+@utility serif-display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  font-feature-settings: "lnum";
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+/* Vertical text used in editorial sections */
+@utility writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* Fine gold hairline divider */
+@utility gold-line {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-gold-soft),
+    transparent
+  );
+}
+
+/* Grain overlay texture */
+.grain-overlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("/images/grain.png");
+}
+
+/* Hide number input arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
