@@ -117,7 +117,7 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-xl px-5 pt-32 pb-20 text-center sm:px-8 lg:pt-40">
-        <h1 className="serif-display text-4xl text-charcoal">Checkout</h1>
+        <h1 className="type-heading-xl text-charcoal">Checkout</h1>
         <p className="mt-3 text-mist">Your bag is empty — add a few pieces to begin.</p>
         <Button className="mt-6" onClick={() => router.push("/sarees")}>
           Browse the Collection
@@ -128,7 +128,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 pb-16 pt-32 sm:px-8 lg:px-10 lg:pt-40">
-      <h1 className="serif-display mb-2 text-4xl text-charcoal">Checkout</h1>
+      <h1 className="type-heading-xl mb-2 text-charcoal">Checkout</h1>
 
       {/* Stepper */}
       <ol className="no-scrollbar mb-10 flex items-center gap-2 overflow-x-auto py-2">
@@ -137,7 +137,7 @@ export default function CheckoutPage() {
             <button
               onClick={() => i < step && setStep(i)}
               className={cn(
-                "flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] transition-colors",
+                "flex items-center gap-2 rounded-full px-3 py-1.5 type-label-sm transition-colors",
                 i === step
                   ? "bg-charcoal text-ivory"
                   : i < step
@@ -165,7 +165,7 @@ export default function CheckoutPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.35 }}
               >
-                <h2 className="serif-display mb-6 text-2xl text-charcoal">Contact Details</h2>
+                <h2 className="type-heading-md mb-6 text-charcoal">Contact Details</h2>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label="Email" required error={errors.email} className="sm:col-span-2">
                     <TextInput
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.35 }}
               >
-                <h2 className="serif-display mb-6 text-2xl text-charcoal">Delivery Address</h2>
+                <h2 className="type-heading-md mb-6 text-charcoal">Delivery Address</h2>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label="Full Name" required error={errors.fullName}>
                     <TextInput
@@ -282,7 +282,7 @@ export default function CheckoutPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.35 }}
               >
-                <h2 className="serif-display mb-6 text-2xl text-charcoal">Shipping Method</h2>
+                <h2 className="type-heading-md mb-6 text-charcoal">Shipping Method</h2>
                 <div className="space-y-3">
                   {SHIPPING_OPTIONS.map((opt) => (
                     <button
@@ -323,7 +323,7 @@ export default function CheckoutPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.35 }}
               >
-                <h2 className="serif-display mb-2 text-2xl text-charcoal">Payment</h2>
+                <h2 className="type-heading-md mb-2 text-charcoal">Payment</h2>
                 <p className="mb-6 flex items-center gap-1.5 text-sm text-mist">
                   <Lock width={13} height={13} />
                   256-bit encrypted · Your details are safe with us
@@ -378,7 +378,7 @@ export default function CheckoutPage() {
                 >
                   <Check width={28} height={28} strokeWidth={2.5} />
                 </motion.div>
-                <h2 className="serif-display text-3xl text-charcoal">Almost done!</h2>
+                <h2 className="type-heading-lg text-charcoal">Almost done!</h2>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-mist">
                   Review the summary once more, then place your order. We&apos;ll confirm it
                   immediately on email and SMS.
@@ -423,9 +423,9 @@ export default function CheckoutPage() {
             className="flex w-full items-center justify-between rounded-xl border border-clay/60 bg-white/60 px-5 py-4 lg:pointer-events-none lg:cursor-default"
             aria-expanded={summaryOpen}
           >
-            <h2 className="serif-display text-lg text-charcoal">Order Summary</h2>
+            <h2 className="type-heading-md text-charcoal">Order Summary</h2>
             <span className="flex items-center gap-3 lg:hidden">
-              <span className="serif-display text-lg text-charcoal">{formatINR(total)}</span>
+              <span className="type-price text-charcoal">{formatINR(total)}</span>
               <ChevronDown className={cn("transition-transform", summaryOpen && "rotate-180")} width={18} height={18} />
             </span>
           </button>
@@ -475,7 +475,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between border-t border-clay/60 pt-3 text-base">
                       <span className="font-medium text-charcoal">Total</span>
-                      <span className="serif-display text-xl tabular-nums text-charcoal">{formatINR(total)}</span>
+                      <span className="type-price-lg tabular-nums text-charcoal">{formatINR(total)}</span>
                     </div>
                   </div>
                 </div>

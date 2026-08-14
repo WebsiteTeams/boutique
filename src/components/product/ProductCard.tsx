@@ -41,7 +41,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
       quantity: 1,
       customizable: product.customizable,
     });
-    showToast("Added to your bag", product.name);
+    showToast("Added to cart", product.name);
   };
 
   return (
@@ -53,7 +53,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
         transition={{ duration: 0.6, delay: Math.min(index % 4, 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
         className={cn("group relative flex flex-col", className)}
       >
-        <div className="relative overflow-hidden rounded-xl bg-cream">
+        <div className="relative overflow-hidden bg-cream">
           <Link href={`/product/${product.slug}`} className="relative block aspect-[4/5]" aria-label={product.name}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -96,7 +96,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
               );
             }}
             aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/90 shadow-soft backdrop-blur transition-all duration-300 hover:scale-105"
+            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/90 shadow-soft backdrop-blur transition-all duration-300 hover:scale-105 lg:translate-y-1 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
           >
             <Heart
               width={17}
@@ -115,7 +115,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
             className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             aria-label={`Quick view ${product.name}`}
           >
-            <span className="flex items-center gap-2 rounded-full bg-ivory/90 px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal shadow-lifted backdrop-blur">
+            <span className="type-label-sm flex items-center gap-2 rounded-full bg-ivory/90 px-4 py-2 text-charcoal shadow-lifted backdrop-blur">
               <Eye width={14} height={14} />
               Quick View
             </span>
@@ -125,7 +125,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           {product.inStock && (
             <button
               onClick={quickAdd}
-              className="absolute inset-x-3 bottom-3 hidden translate-y-2 items-center justify-center rounded-full bg-charcoal py-2.5 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-ivory opacity-0 shadow-lifted transition-all duration-300 hover:bg-ink lg:flex group-hover:translate-y-0 group-hover:opacity-100"
+              className="type-btn absolute inset-x-3 bottom-3 hidden translate-y-2 items-center justify-center rounded-full bg-charcoal py-2.5 text-ivory opacity-0 shadow-lifted transition-all duration-300 hover:bg-ink lg:flex group-hover:translate-y-0 group-hover:opacity-100"
             >
               Add to Cart
             </button>
@@ -147,12 +147,12 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           <div className="flex items-baseline justify-between gap-2">
             <Link
               href={`/product/${product.slug}`}
-              className="truncate text-[0.95rem] font-medium tracking-wide text-charcoal transition-colors hover:text-gold-deep"
+              className="truncate type-title text-charcoal transition-colors hover:text-gold-deep"
             >
               {product.name}
             </Link>
           </div>
-          <p className="text-xs capitalize text-mist">
+          <p className="type-meta capitalize text-muted">
             {product.fabric} · {product.color}
           </p>
           <Price price={product.price} mrp={product.mrp} size="sm" className="mt-0.5" />

@@ -28,32 +28,25 @@ export function Newsletter({
   return (
     <div
       className={cn(
-        "flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between",
+        "flex flex-col items-center gap-7 text-center lg:flex-row lg:justify-between lg:text-left",
         className
       )}
     >
-      <div className="max-w-md">
-        <p
-          className={cn(
-            "eyebrow mb-3",
-            dark ? "text-gold-soft" : "text-gold-deep"
-          )}
-        >
-          The Edit
-        </p>
+      <div className="max-w-xl">
         <h3
           className={cn(
-            "serif-display text-2xl sm:text-[1.7rem]",
+            "type-heading-xl text-balance",
             dark ? "text-ivory" : "text-charcoal"
           )}
         >
-          Join our world of timeless style.
+          Stay Close to the Collection
         </h3>
-        <p className={cn("mt-2 text-sm leading-relaxed", dark ? "text-ivory/60" : "text-mist")}>
-          Early access to collections, styling notes and private previews. No noise, ever.
+        <p className={cn("mt-3 text-sm leading-relaxed", dark ? "text-ivory/60" : "text-mist")}>
+          Be the first to discover new arrivals, festive edits and exclusive boutique
+          releases.
         </p>
       </div>
-      <form onSubmit={submit} className="w-full sm:w-auto" noValidate>
+      <form onSubmit={submit} className="w-full max-w-md" noValidate>
         <div
           className={cn(
             "flex items-center gap-2 rounded-full border p-1.5 transition-colors focus-within:border-gold",
@@ -67,14 +60,14 @@ export function Newsletter({
             placeholder="Your email address"
             aria-label="Email address"
             className={cn(
-              "w-full min-w-0 flex-1 bg-transparent px-4 text-sm focus:outline-none sm:w-64",
+              "w-full min-w-0 flex-1 bg-transparent px-4 text-sm focus:outline-none",
               dark ? "text-ivory placeholder:text-ivory/40" : "text-charcoal placeholder:text-taupe"
             )}
           />
           <button
             type="submit"
             className={cn(
-              "inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full px-5 text-[0.68rem] font-medium uppercase tracking-[0.18em] transition-colors",
+              "type-btn inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full px-5 transition-colors",
               dark
                 ? "bg-ivory text-charcoal hover:bg-white"
                 : "bg-charcoal text-ivory hover:bg-ink"

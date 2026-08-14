@@ -69,7 +69,7 @@ export default function AdminPage() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow mb-2 text-gold-deep">UMA Designers · Admin</p>
-          <h1 className="serif-display text-4xl text-charcoal">Store Dashboard</h1>
+          <h1 className="type-heading-xl text-charcoal">Store Dashboard</h1>
         </div>
         <div className="flex items-center gap-2 text-sm text-mist">
           <span className="h-2 w-2 rounded-full bg-emerald-500" />
@@ -192,7 +192,7 @@ export default function AdminPage() {
                       { label: "Add Product", icon: PackagePlus, to: "/admin/products" },
                       { label: "New Custom Order", icon: Shirt, to: "/custom-blouse" },
                       { label: "View All Orders", icon: ShoppingBag, to: "/orders" },
-                      { label: "Manage Catalog", icon: Package, to: "/collections" },
+                      { label: "Manage Catalog", icon: Package, to: "/admin/products" },
                     ].map((a) => (
                       <LinkButton key={a.label} href={a.to} variant="ghost" className="justify-start border border-clay/60 p-4">
                         <a.icon width={16} height={16} className="text-gold-deep" />

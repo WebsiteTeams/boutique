@@ -46,7 +46,7 @@ export default function ShippingPage() {
       </div>
 
       <section className="rounded-2xl border border-clay/60 bg-white/60 p-6 sm:p-7">
-        <h2 className="serif-display mb-5 text-xl text-charcoal">Delivery Charges</h2>
+        <h2 className="type-heading-md mb-5 text-charcoal">Delivery Charges</h2>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[460px] text-left text-sm">
             <thead>

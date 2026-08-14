@@ -38,13 +38,13 @@ export function FilterSidebar({
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "flex h-full w-[300px] flex-col overflow-y-auto bg-ivory",
-        !mobile && "w-auto lg:block",
+        !mobile && "w-auto lg:block lg:max-h-[calc(100vh-10rem)]",
         className
       )}
     >
       {mobile && (
         <div className="flex items-center justify-between border-b border-clay/60 px-6 py-5">
-          <h3 className="serif-display flex items-center gap-2 text-lg text-charcoal">
+          <h3 className="type-heading-md flex items-center gap-2 text-charcoal">
             <SlidersHorizontal width={16} height={16} />
             Filters
             {activeCount > 0 && (
@@ -88,6 +88,7 @@ export function FilterSidebar({
                   return (
                     <label
                       key={option}
+                      onMouseDown={(e) => e.preventDefault()}
                       className="group flex cursor-pointer items-center gap-3"
                     >
                       <span
@@ -127,7 +128,7 @@ export function FilterSidebar({
         <div className="absolute inset-x-0 bottom-0 border-t border-clay/60 bg-ivory p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <button
             onClick={onClose}
-            className="flex h-12 w-full items-center justify-center rounded-full bg-charcoal text-[0.72rem] font-medium uppercase tracking-[0.2em] text-ivory"
+            className="type-btn flex h-12 w-full items-center justify-center rounded-full bg-charcoal text-ivory"
           >
             Show results
           </button>

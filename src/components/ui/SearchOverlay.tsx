@@ -104,7 +104,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                 </div>
               ) : results.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="serif-display text-xl text-charcoal">No results found</p>
+                  <p className="type-heading-md text-charcoal">No results found</p>
                   <p className="mt-2 text-sm text-mist">
                     Try “silk”, “linen” or “organza” instead.
                   </p>

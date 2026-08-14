@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Shop } from "@/components/shop/Shop";
+import { P } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Chudithars",
@@ -14,6 +15,7 @@ export default function ChuditharsPage() {
       description="Ready-made chudithars in crisp linen, flowing silk and breathable cotton — designed to move with your day, sized S to XXL."
       category="chudithars"
       showSizeGuide
+      image={P.categories.chudithars}
     />
   );
 }

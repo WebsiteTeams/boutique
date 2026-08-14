@@ -32,7 +32,7 @@ export function Lookbook() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.75, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className={cn("group relative overflow-hidden rounded-2xl", layout[c.id])}
+              className={cn("group relative overflow-hidden bg-ink", layout[c.id])}
             >
               <Link href="/collections" className="relative block h-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -42,15 +42,12 @@ export function Lookbook() {
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1300ms] ease-out group-hover:scale-[1.04]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent transition-opacity duration-500" />
 
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                   <p className="eyebrow mb-1.5 text-gold-soft">{c.tagline}</p>
-                  <h3 className="serif-display text-2xl text-ivory sm:text-3xl">{c.name}</h3>
-                  <p className="mt-2 max-w-[36ch] text-sm leading-relaxed text-ivory/70">
-                    {c.description}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-ivory/90">
+                  <h3 className="type-heading-lg text-ivory">{c.name}</h3>
+                  <span className="mt-5 inline-flex items-center gap-2 type-btn text-ivory/90">
                     Explore Edit
                     <ArrowRight width={15} height={15} className="transition-transform duration-300 group-hover:translate-x-1" />
                   </span>

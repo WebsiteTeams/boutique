@@ -41,7 +41,7 @@ export function ProductInfo({ product }: { product: Product }) {
       quantity,
       customizable: product.customizable,
     });
-    showToast("Added to your bag", product.name);
+    showToast("Added to cart", product.name);
   };
 
   const buyNow = () => {
@@ -55,7 +55,7 @@ export function ProductInfo({ product }: { product: Product }) {
       <p className="eyebrow mb-3 capitalize text-gold-deep">
         {product.category} · {product.subcategory}
       </p>
-      <h1 className="serif-display text-3xl leading-tight text-charcoal sm:text-4xl">
+      <h1 className="type-title-lg text-charcoal">
         {product.name}
       </h1>
       <Rating value={product.rating} count={product.reviewCount} className="mt-3" />
@@ -94,7 +94,7 @@ export function ProductInfo({ product }: { product: Product }) {
       {product.sizes && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-charcoal/80">
+            <span className="type-label text-charcoal/80">
               Select Size
             </span>
             <button
@@ -121,7 +121,7 @@ export function ProductInfo({ product }: { product: Product }) {
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-mist">Fits S–XXL · Refer to the size chart before ordering.</p>
+          <p className="mt-2 type-meta text-muted">Fits S–XXL · Refer to the size chart before ordering.</p>
         </div>
       )}
 
@@ -137,7 +137,7 @@ export function ProductInfo({ product }: { product: Product }) {
 
       {/* Quantity */}
       <div className="mt-6">
-        <span className="mb-2.5 block text-[0.7rem] font-medium uppercase tracking-[0.18em] text-charcoal/80">
+        <span className="mb-2.5 block type-label text-charcoal/80">
           Quantity
         </span>
         <QuantityStepper value={quantity} onChange={setQuantity} />

@@ -16,9 +16,9 @@ export function SizeGuide({
         <div className="overflow-hidden rounded-xl bg-cream">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/size-guide.png"
-            alt="How to measure: bust, waist, hips, shoulder"
-            className="w-full object-cover"
+            src="/images/custom-blouse/size-guide.png"
+            alt="Custom blouse measurement size guide: bust, shoulder, waist, armhole, sleeve length, blouse length and neck depth"
+            className="h-auto w-full object-contain"
           />
         </div>
 

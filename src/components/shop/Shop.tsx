@@ -2,8 +2,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { Product } from "@/types";
+import { cn } from "@/lib/utils";
 import { products as allProducts } from "@/lib/data";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { FilterSidebar, type FilterGroup } from "@/components/product/FilterSidebar";
@@ -61,9 +63,13 @@ function matches(product: Product, selected: Record<string, string[]>, search: s
     if (group === "price") {
       const ok = values.some((v) => PRICE_BANDS.find((b) => b.label === v)?.test(product.price));
       if (!ok) return false;
+    } else if (group === "category") {
+      if (!values.includes(product.subcategory)) return false;
     } else if (group === "availability") {
-      if (values.includes("Made to Order") && !product.customizable) return false;
-      if (values.includes("In Stock") && !product.inStock) return false;
+      const ok =
+        (values.includes("In Stock") && product.inStock) ||
+        (values.includes("Made to Order") && product.customizable);
+      if (!ok) return false;
     } else {
       if (!values.includes(String(product[group as keyof Product]))) return false;
     }
@@ -71,7 +77,16 @@ function matches(product: Product, selected: Record<string, string[]>, search: s
   return true;
 }
 
-export function Shop({ title, description, category, onlyNew, showSizeGuide }: ShopProps) {
+export function Shop(props: ShopProps) {
+  return (
+    <Suspense fallback={null}>
+      <ShopInner {...props} />
+    </Suspense>
+  );
+}
+
+function ShopInner({ title, description, category, onlyNew, showSizeGuide, image }: ShopProps) {
+  const searchParams = useSearchParams();
   const list = useMemo(() => {
     let base = category ? allProducts.filter((p) => p.category === category) : allProducts;
     if (onlyNew) base = base.filter((p) => p.isNew);
@@ -79,13 +94,28 @@ export function Shop({ title, description, category, onlyNew, showSizeGuide }: S
   }, [category, onlyNew]);
   const groups = useMemo(() => buildGroups(list), [list]);
 
-  const [selected, setSelected] = useState<Record<string, string[]>>({});
+  const [selected, setSelected] = useState<Record<string, string[]>>(() => {
+    const init: Record<string, string[]> = {};
+    const sub = searchParams.get("sub");
+    if (sub) init.category = [sub];
+    const occasion = searchParams.get("occasion");
+    if (occasion) init.occasion = [occasion];
+    return init;
+  });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const activeCount = Object.values(selected).reduce((a, v) => a + v.length, 0);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [filtersOpen]);
 
   const toggle = (groupId: string, value: string) => {
     setSelected((prev) => {
@@ -123,21 +153,53 @@ export function Shop({ title, description, category, onlyNew, showSizeGuide }: S
   return (
     <>
       {/* Header */}
-      <header className="border-b border-clay/50 bg-cream/50">
-        <div className="mx-auto max-w-[1440px] px-5 pb-10 pt-32 sm:px-8 lg:px-10 lg:pt-20 lg:pb-14">
+      <header
+        className={cn(
+          "relative overflow-hidden border-b border-clay/50",
+          image ? "bg-ink" : "bg-cream/50"
+        )}
+      >
+        {image && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-45"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/40 to-ink/20" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink/70 to-transparent" />
+          </>
+        )}
+        <div className="relative z-10 mx-auto max-w-[1440px] px-5 pb-12 pt-32 sm:px-8 lg:px-10 lg:pt-40 lg:pb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="eyebrow mb-3 flex items-center gap-3 text-gold-deep">
+            <p
+              className={cn(
+                "eyebrow mb-3 flex items-center gap-3",
+                image ? "text-gold-soft" : "text-gold-deep"
+              )}
+            >
               <span className="h-px w-8 bg-gold" />
               UMA Collection
             </p>
-            <h1 className="serif-display text-4xl text-charcoal sm:text-5xl lg:text-6xl">
+            <h1
+              className={cn(
+                "type-display-lg",
+                image ? "text-ivory" : "text-charcoal"
+              )}
+            >
               {title}
             </h1>
-            <p className="mt-4 max-w-xl text-[0.95rem] leading-relaxed text-mist">
+            <p
+              className={cn(
+                "mt-4 max-w-xl type-body leading-relaxed",
+                image ? "text-ivory/80" : "text-mist"
+              )}
+            >
               {description}
             </p>
           </motion.div>

@@ -48,7 +48,7 @@ export default function FaqsPage() {
     >
       {GROUPS.map((g) => (
         <section key={g.category} className="mb-10 last:mb-0">
-          <h2 className="serif-display mb-3 text-xl text-charcoal">{g.category}</h2>
+          <h2 className="type-heading-md mb-3 text-charcoal">{g.category}</h2>
           <Accordion>
             {g.items.map((f) => (
               <AccordionItem key={f.q} title={f.q}>

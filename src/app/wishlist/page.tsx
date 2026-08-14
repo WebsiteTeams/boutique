@@ -36,6 +36,7 @@ export default function WishlistPage() {
         quantity: 1,
         customizable: p.customizable,
       });
+      showToast("Added to cart", p.name);
       setAdding(null);
     }, 350);
   };
@@ -44,7 +45,7 @@ export default function WishlistPage() {
     <div className="mx-auto max-w-[1440px] px-5 pb-20 pt-32 sm:px-8 lg:px-10 lg:pt-40">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="serif-display text-4xl text-charcoal">Wishlist</h1>
+          <h1 className="type-heading-xl text-charcoal">Wishlist</h1>
           <p className="mt-2 text-mist">
             {products.length > 0
               ? `${products.length} ${products.length === 1 ? "piece" : "pieces"} you love`

@@ -19,9 +19,9 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "h-9 px-4 text-[0.7rem] tracking-[0.18em] gap-2",
-  md: "h-12 px-7 text-[0.72rem] tracking-[0.22em] gap-2.5",
-  lg: "h-14 px-9 text-[0.74rem] tracking-[0.24em] gap-3",
+  sm: "h-9 px-4 text-[0.7rem] tracking-[0.16em] gap-2",
+  md: "h-12 px-7 text-[0.72rem] tracking-[0.16em] gap-2.5",
+  lg: "h-14 px-9 text-[0.74rem] tracking-[0.16em] gap-3",
 };
 
 interface BaseProps {
@@ -51,7 +51,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-full font-medium uppercase transition-all duration-300 ease-out",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-full font-semibold uppercase transition-all duration-300 ease-out",
         "[&_svg]:transition-transform [&_svg]:duration-300 ease-out hover:[&_svg]:translate-x-1",
         "active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
         variantClasses[variant],

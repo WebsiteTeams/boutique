@@ -32,7 +32,7 @@ export function EmptyState({
       <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-clay bg-cream text-gold-deep">
         {icon}
       </div>
-      <h3 className="serif-display text-2xl text-charcoal">{title}</h3>
+      <h3 className="type-heading-lg text-charcoal">{title}</h3>
       {description && (
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-mist">{description}</p>
       )}

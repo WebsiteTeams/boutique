@@ -45,14 +45,14 @@ export function CustomBlouseFeature() {
           >
             <p className="eyebrow mb-6 flex items-center gap-3 text-gold-deep">
               <span className="h-px w-10 bg-gold" />
-              Made For You
+              Bespoke Atelier
             </p>
-            <h2 className="serif-display text-4xl leading-[1.08] text-charcoal text-balance sm:text-5xl">
+            <h2 className="type-display-lg text-charcoal text-balance">
               Your Blouse.
               <br />
               <em className="text-gold-deep">Your Design.</em>
             </h2>
-            <p className="mt-6 max-w-md text-[0.98rem] leading-relaxed text-charcoal/70">
+            <p className="mt-6 max-w-md type-body text-charcoal/70">
               Create a blouse that reflects your style, measurements and personality
               — then share your details and our master tailors bring it to life in
               twelve days.
@@ -84,7 +84,7 @@ export function CustomBlouseFeature() {
               className="mt-10"
             >
               <LinkButton href="/custom-blouse" variant="gold" size="lg">
-                Customize Your Blouse
+                Start Customizing
                 <ArrowRight width={16} height={16} />
               </LinkButton>
             </motion.div>

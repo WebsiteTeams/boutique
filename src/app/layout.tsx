@@ -4,7 +4,6 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileNav } from "@/components/layout/MobileNav";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const cormorant = Cormorant_Garamond({
@@ -32,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#faf7f1",
+  themeColor: "#f7f3ec",
 };
 
 export default function RootLayout({
@@ -49,7 +48,6 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
-          <MobileNav />
           <CartDrawer />
         </Providers>
       </body>

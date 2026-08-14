@@ -37,12 +37,12 @@ export default function AboutPage() {
       <header className="border-b border-clay/50 bg-cream/50">
         <div className="mx-auto max-w-4xl px-5 pb-14 pt-32 text-center sm:px-8 lg:pt-20">
           <p className="eyebrow mb-3 text-gold-deep">Our Story</p>
-          <h1 className="serif-display text-4xl text-charcoal sm:text-5xl lg:text-6xl">
+          <h1 className="type-display-lg text-charcoal">
             Woven by Hand,
             <br />
             Made for You
           </h1>
-          <p className="mx-auto mt-5 max-w-xl leading-relaxed text-mist">
+          <p className="mx-auto mt-5 max-w-xl type-body leading-relaxed text-mist">
             UMA Designers began in a small Madras home with a single sewing machine and a
             belief: Indian fashion should feel personal. Today, our atelier dresses women
             across the country in sarees, chudithars and blouses crafted around their story.
@@ -59,8 +59,8 @@ export default function AboutPage() {
             { n: "40+", label: "Weaving partners" },
           ].map((s) => (
             <RevealItem key={s.label} className="border border-clay/50 p-8 text-center">
-              <p className="serif-display text-4xl text-gold-deep">{s.n}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.18em] text-mist">{s.label}</p>
+              <p className="type-heading-xl text-gold-deep">{s.n}</p>
+              <p className="mt-2 type-label text-mist">{s.label}</p>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -131,7 +131,7 @@ export default function AboutPage() {
               <LinkButton
                 href="/collections"
                 variant="ghost"
-                className="group relative block h-full w-full overflow-hidden rounded-2xl p-0"
+                className="group relative block h-full w-full overflow-hidden p-0"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -142,10 +142,10 @@ export default function AboutPage() {
                 <motion.span className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/10 to-transparent" />
                 <span className="absolute inset-x-6 bottom-6 flex items-end justify-between text-left">
                   <span>
-                    <span className="block text-xs uppercase tracking-[0.2em] text-gold-soft">
+                    <span className="type-label-sm block text-gold-soft">
                       {c.tagline}
                     </span>
-                    <span className="serif-display mt-1 block text-2xl text-ivory">
+                    <span className="type-heading-lg mt-1 block text-ivory">
                       {c.name}
                     </span>
                   </span>

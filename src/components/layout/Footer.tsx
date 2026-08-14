@@ -4,7 +4,11 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { Newsletter } from "@/components/ui/Newsletter";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/SocialIcons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  WhatsAppIcon,
+} from "@/components/ui/SocialIcons";
 
 const LINK_GROUPS = [
   {
@@ -13,26 +17,26 @@ const LINK_GROUPS = [
       { label: "Sarees", href: "/sarees" },
       { label: "Chudithars", href: "/chudithars" },
       { label: "Custom Blouse", href: "/custom-blouse" },
-      { label: "New Arrivals", href: "/new-arrivals" },
       { label: "Collections", href: "/collections" },
     ],
   },
   {
-    heading: "Company",
+    heading: "About",
     links: [
-      { label: "About", href: "/about" },
+      { label: "Our Story", href: "/about" },
       { label: "Contact", href: "/contact" },
+      { label: "Size Guide", href: "/size-guide" },
       { label: "Shipping", href: "/shipping" },
       { label: "Returns", href: "/returns" },
     ],
   },
   {
-    heading: "Customer Care",
+    heading: "Support",
     links: [
-      { label: "FAQs", href: "/faqs" },
-      { label: "Size Guide", href: "/size-guide" },
+      { label: "FAQ", href: "/faqs" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
       { label: "Order Tracking", href: "/orders" },
-      { label: "Bespoke Blouse", href: "/custom-blouse" },
     ],
   },
 ];
@@ -40,38 +44,44 @@ const LINK_GROUPS = [
 const SOCIALS = [
   { label: "Instagram", href: "#", icon: InstagramIcon },
   { label: "Facebook", href: "#", icon: FacebookIcon },
-  { label: "YouTube", href: "#", icon: YoutubeIcon },
+  { label: "WhatsApp", href: "#", icon: WhatsAppIcon },
 ];
 
 export function Footer() {
   return (
-    <footer className="mt-20 bg-charcoal text-ivory">
+    <footer className="bg-charcoal text-ivory">
       {/* Newsletter band */}
       <div className="border-b border-ivory/10">
-        <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-10 lg:py-16">
+        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
           <Newsletter dark />
         </div>
       </div>
 
       {/* Link columns */}
-      <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-10 lg:py-16">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-5">
-          <div className="col-span-2">
+      <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-10 lg:py-20">
+        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="lg:col-span-2">
             <Logo dark />
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-ivory/60">
+            <p className="mt-6 max-w-xs text-sm leading-relaxed text-ivory/60">
               A design-led boutique for sarees, chudithars and made-to-measure
               blouses — woven for the modern Indian woman.
             </p>
-            <div className="mt-6 space-y-2 text-sm text-ivory/60">
+            <div className="mt-7 space-y-3 text-sm text-ivory/60">
               <p className="flex items-center gap-3">
                 <MapPin width={15} height={15} className="text-gold-soft" />
                 #12, Boutique Lane, T Nagar, Chennai 600017
               </p>
-              <a href="tel:+919876543210" className="flex items-center gap-3 transition-colors hover:text-ivory">
+              <a
+                href="tel:+919876543210"
+                className="flex items-center gap-3 transition-colors hover:text-ivory"
+              >
                 <Phone width={15} height={15} className="text-gold-soft" />
                 +91 98765 43210
               </a>
-              <a href="mailto:hello@umadesigners.in" className="flex items-center gap-3 transition-colors hover:text-ivory">
+              <a
+                href="mailto:hello@umadesigners.in"
+                className="flex items-center gap-3 transition-colors hover:text-ivory"
+              >
                 <Mail width={15} height={15} className="text-gold-soft" />
                 hello@umadesigners.in
               </a>
@@ -80,8 +90,8 @@ export function Footer() {
 
           {LINK_GROUPS.map((group) => (
             <div key={group.heading}>
-              <h4 className="eyebrow mb-4 text-gold-soft">{group.heading}</h4>
-              <ul className="space-y-2.5">
+              <h4 className="eyebrow mb-5 text-gold-soft">{group.heading}</h4>
+              <ul className="space-y-3">
                 {group.links.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -95,6 +105,23 @@ export function Footer() {
               </ul>
             </div>
           ))}
+
+          <div>
+            <h4 className="eyebrow mb-5 text-gold-soft">Social</h4>
+            <ul className="space-y-3">
+              {SOCIALS.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    className="inline-flex items-center gap-3 text-sm text-ivory/60 transition-colors hover:text-ivory"
+                  >
+                    <s.icon size={16} className="text-gold-soft" />
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -104,18 +131,6 @@ export function Footer() {
           <p className="text-xs text-ivory/40">
             © {new Date().getFullYear()} UMA Designers. All rights reserved.
           </p>
-          <div className="flex items-center gap-5">
-            {SOCIALS.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                aria-label={s.label}
-                className="text-ivory/50 transition-colors hover:text-gold-soft"
-              >
-                <s.icon width={18} height={18} />
-              </a>
-            ))}
-          </div>
           <div className="flex items-center gap-2">
             {["UPI", "VISA", "Mastercard", "COD"].map((p) => (
               <span

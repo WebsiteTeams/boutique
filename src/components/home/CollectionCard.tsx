@@ -27,7 +27,7 @@ export function CollectionCard({
       transition={{ duration: 0.75, delay: revealDelay, ease: [0.22, 1, 0.36, 1] }}
       className={cn("group relative overflow-hidden rounded-2xl", className)}
     >
-      <Link href="/collections" className="relative block">
+      <Link href="/sarees" className="relative block">
         <div className={cn("relative overflow-hidden", aspect)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -40,13 +40,13 @@ export function CollectionCard({
         </div>
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
           <p className="eyebrow mb-1.5 text-gold-soft">{collection.tagline}</p>
-          <h3 className="serif-display text-2xl leading-tight text-ivory sm:text-[1.9rem]">
+          <h3 className="type-heading-lg text-ivory">
             {collection.name}
           </h3>
-          <p className="mt-1.5 line-clamp-2 max-w-[26ch] text-xs leading-relaxed text-ivory/70">
+          <p className="mt-1.5 line-clamp-2 max-w-[26ch] type-meta leading-relaxed text-ivory/70">
             {collection.description}
           </p>
-          <span className="mt-4 inline-flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-ivory/90">
+          <span className="mt-4 inline-flex items-center gap-2 type-btn text-ivory/90">
             Explore
             <ArrowRight width={15} height={15} className="transition-transform duration-300 group-hover:translate-x-1" />
           </span>

@@ -37,7 +37,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-5 pt-32 pb-16 sm:px-8 lg:pt-40">
-        <h1 className="serif-display mb-8 text-center text-4xl text-charcoal">Your Bag</h1>
+        <h1 className="type-heading-xl mb-8 text-center text-charcoal">Your Bag</h1>
         <div className="rounded-2xl border border-clay/60 bg-white/60">
           <EmptyState
             icon={<ShoppingBag width={26} height={26} />}
@@ -53,7 +53,7 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 pb-16 pt-32 sm:px-8 lg:px-10 lg:pt-40">
-      <h1 className="serif-display mb-8 text-4xl text-charcoal">Your Bag</h1>
+      <h1 className="type-heading-xl mb-8 text-charcoal">Your Bag</h1>
 
       <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
         {/* Items */}
@@ -165,7 +165,7 @@ export default function CartPage() {
         {/* Summary */}
         <aside className="lg:sticky lg:top-32 lg:self-start">
           <div className="rounded-2xl border border-clay/60 bg-white/60 p-6 sm:p-7">
-            <h2 className="serif-display mb-5 text-xl text-charcoal">Order Summary</h2>
+            <h2 className="type-heading-md mb-5 text-charcoal">Order Summary</h2>
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ export default function CartPage() {
               )}
               <div className="flex items-center justify-between border-t border-clay/60 pt-4 text-base">
                 <span className="font-medium text-charcoal">Total</span>
-                <span className="serif-display text-2xl tabular-nums text-charcoal">
+                <span className="type-price-lg tabular-nums text-charcoal">
                   {formatINR(total)}
                 </span>
               </div>

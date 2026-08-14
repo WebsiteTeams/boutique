@@ -33,7 +33,7 @@ export function InstagramFeed() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.55, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative block aspect-square overflow-hidden rounded-xl"
+            className="group relative block aspect-square overflow-hidden"
             aria-label={`View ${HANDLES[i]} on Instagram`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -45,7 +45,7 @@ export function InstagramFeed() {
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ink/0 opacity-0 transition-all duration-400 group-hover:bg-ink/50 group-hover:opacity-100">
               <InstagramIcon size={22} className="text-ivory" />
-              <span className="text-[0.62rem] font-medium uppercase tracking-[0.16em] text-ivory">
+              <span className="type-label-sm text-ivory">
                 View
               </span>
             </div>

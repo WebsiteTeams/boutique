@@ -9,9 +9,9 @@ export function BestSellers() {
     <section className="mx-auto max-w-[1440px] px-0 py-20 sm:px-0 lg:py-32">
       <div className="px-5 sm:px-8 lg:px-10">
         <SectionHeading
-          eyebrow="Bestsellers"
-          title="Most Loved"
-          subtitle="Pieces our customers keep coming back for."
+          eyebrow="Most Loved"
+          title="The Bestsellers"
+          subtitle="The pieces our customers can't stop wearing."
         />
       </div>
       <ProductCarousel products={bestsellers} />

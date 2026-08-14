@@ -131,7 +131,7 @@ export function CustomBlouseBuilder() {
     };
     setTimeout(() => {
       addCustomBlouse(summary);
-      showToast("Added to your bag", "Your bespoke blouse is in your cart.");
+      showToast("Added to cart", "Your bespoke blouse is in your cart.");
       setSubmitting(false);
     }, 600);
   };
@@ -160,7 +160,7 @@ export function CustomBlouseBuilder() {
             >
               <div className="mb-8">
                 <p className="eyebrow mb-2 text-gold-deep">Step 01 — Design</p>
-                <h2 className="serif-display text-2xl text-charcoal sm:text-3xl">
+                <h2 className="type-heading-lg text-charcoal">
                   Choose every detail
                 </h2>
                 <p className="mt-2 text-sm text-mist">
@@ -172,7 +172,7 @@ export function CustomBlouseBuilder() {
                 {customizationGroups.map((group) => (
                   <div key={group.id}>
                     <div className="mb-4 flex items-baseline justify-between">
-                      <h3 className="text-[0.72rem] font-medium uppercase tracking-[0.18em] text-charcoal">
+                      <h3 className="type-label text-charcoal">
                         {group.label}
                       </h3>
                       <span className="text-xs text-mist">
@@ -242,7 +242,7 @@ export function CustomBlouseBuilder() {
               <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="eyebrow mb-2 text-gold-deep">Step 02 — Measurements</p>
-                  <h2 className="serif-display text-2xl text-charcoal sm:text-3xl">
+                  <h2 className="type-heading-lg text-charcoal">
                     Your perfect fit
                   </h2>
                   <p className="mt-2 text-sm text-mist">
@@ -251,7 +251,7 @@ export function CustomBlouseBuilder() {
                 </div>
                 <button
                   onClick={() => setSizeGuideOpen(true)}
-                  className="flex items-center gap-2 rounded-full border border-charcoal/30 px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-charcoal hover:bg-charcoal hover:text-ivory"
+                  className="type-label-sm flex items-center gap-2 rounded-full border border-charcoal/30 px-4 py-2 text-charcoal transition-colors hover:border-charcoal hover:bg-charcoal hover:text-ivory"
                 >
                   Use Our Size Guide
                 </button>
@@ -260,9 +260,9 @@ export function CustomBlouseBuilder() {
               <div className="mb-8 overflow-hidden rounded-xl bg-cream">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/size-guide.png"
-                  alt="Visual measurement guide"
-                  className="w-full object-cover"
+                  src="/images/custom-blouse/size-guide.png"
+                  alt="Custom blouse measurement size guide"
+                  className="h-auto w-full object-contain"
                 />
               </div>
 
@@ -302,7 +302,7 @@ export function CustomBlouseBuilder() {
             >
               <div className="mb-8">
                 <p className="eyebrow mb-2 text-gold-deep">Step 03 — Reference</p>
-                <h2 className="serif-display text-2xl text-charcoal sm:text-3xl">
+                <h2 className="type-heading-lg text-charcoal">
                   Share a reference
                 </h2>
                 <p className="mt-2 text-sm text-mist">
@@ -343,7 +343,7 @@ export function CustomBlouseBuilder() {
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream text-gold-deep">
                     <UploadCloud width={24} height={24} />
                   </span>
-                  <span className="serif-display text-xl text-charcoal">
+                  <span className="type-heading-md text-charcoal">
                     Drag & drop your reference
                   </span>
                   <span className="text-sm text-mist">
@@ -369,7 +369,7 @@ export function CustomBlouseBuilder() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-3 right-3 rounded-full bg-ivory/90 px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal backdrop-blur"
+                    className="type-label-sm absolute bottom-3 right-3 rounded-full bg-ivory/90 px-4 py-2 text-charcoal backdrop-blur"
                   >
                     Replace
                   </button>
@@ -400,7 +400,7 @@ export function CustomBlouseBuilder() {
             >
               <div className="mb-8">
                 <p className="eyebrow mb-2 text-gold-deep">Step 04 — Review</p>
-                <h2 className="serif-display text-2xl text-charcoal sm:text-3xl">
+                <h2 className="type-heading-lg text-charcoal">
                   Almost there
                 </h2>
                 <p className="mt-2 text-sm text-mist">
@@ -486,7 +486,7 @@ export function CustomBlouseBuilder() {
                     })()}
                     <div className="mt-4 flex items-baseline justify-between border-t border-gold/30 pt-4">
                       <span className="text-sm font-medium text-charcoal">Customization price</span>
-                      <span className="serif-display text-2xl text-charcoal">
+                      <span className="type-price-lg text-charcoal">
                         {formatINR(customizationPrice)}
                       </span>
                     </div>

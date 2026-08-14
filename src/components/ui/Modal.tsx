@@ -55,7 +55,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
             )}
           >
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-clay/70 bg-ivory/95 px-6 py-4 backdrop-blur">
-              <h3 className="serif-display text-xl text-charcoal">{title}</h3>
+              <h3 className="type-heading-md text-charcoal">{title}</h3>
               <button
                 onClick={onClose}
                 className="rounded-full p-2 text-charcoal/60 transition-colors hover:bg-sand/60 hover:text-charcoal"

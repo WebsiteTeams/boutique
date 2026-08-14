@@ -1,6 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
-import { NewArrivals } from "@/components/home/NewArrivals";
+import { SareeEdit } from "@/components/home/SareeEdit";
 import { BestSellers } from "@/components/home/BestSellers";
 import { CustomBlouseFeature } from "@/components/home/CustomBlouseFeature";
 import { Lookbook } from "@/components/home/Lookbook";
@@ -15,7 +15,7 @@ export default function HomePage() {
       <Hero />
       <ServicePerks />
       <FeaturedCategories />
-      <NewArrivals />
+      <SareeEdit />
       <BestSellers />
       <CustomBlouseFeature />
       <Lookbook />

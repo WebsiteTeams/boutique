@@ -51,7 +51,7 @@ export default function ReturnsPage() {
       </ol>
 
       <section className="mb-12">
-        <h2 className="serif-display mb-4 text-xl text-charcoal">What can&apos;t be returned</h2>
+        <h2 className="type-heading-md mb-4 text-charcoal">What can&apos;t be returned</h2>
         <ul className="space-y-2.5">
           {EXCEPTIONS.map((e) => (
             <li key={e} className="flex items-start gap-2.5 text-sm leading-relaxed text-mist">
@@ -63,7 +63,7 @@ export default function ReturnsPage() {
       </section>
 
       <section>
-        <h2 className="serif-display mb-4 text-xl text-charcoal">Common Questions</h2>
+        <h2 className="type-heading-md mb-4 text-charcoal">Common Questions</h2>
         <Accordion>
           {[
             { q: "How long do refunds take?", a: "Once the return is received and inspected, refunds are initiated within 48 hours and reflect in 5–7 business days depending on your bank or UPI provider." },
@@ -79,7 +79,7 @@ export default function ReturnsPage() {
       </section>
 
       <div className="mt-10 rounded-2xl bg-charcoal p-7 text-center">
-        <h2 className="serif-display text-xl text-ivory">Ready to start a return?</h2>
+        <h2 className="type-heading-md text-ivory">Ready to start a return?</h2>
         <p className="mt-1.5 text-sm text-mist">Write to us with your order ID and we&apos;ll take it from there.</p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <LinkButton href="/contact" variant="gold" size="sm">

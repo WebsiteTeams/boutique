@@ -37,7 +37,7 @@ export function CartDrawer() {
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-clay/60 px-6 py-5">
-              <h2 className="serif-display flex items-center gap-2.5 text-xl text-charcoal">
+              <h2 className="type-heading-md flex items-center gap-2.5 text-charcoal">
                 <ShoppingBag width={18} height={18} />
                 Your Bag
                 <span className="text-sm text-mist">({count})</span>
@@ -84,7 +84,7 @@ export function CartDrawer() {
                   <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-cream text-gold-deep">
                     <ShoppingBag width={24} height={24} />
                   </div>
-                  <p className="serif-display text-xl text-charcoal">Your bag is empty</p>
+                  <p className="type-heading-md text-charcoal">Your bag is empty</p>
                   <p className="mt-1.5 max-w-[26ch] text-sm text-mist">
                     Discover sarees, chudithars and made-to-measure blouses.
                   </p>

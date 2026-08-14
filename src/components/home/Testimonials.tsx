@@ -11,11 +11,11 @@ export function Testimonials() {
     <section className="bg-ivory">
       <div className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-10 lg:py-32">
         <SectionHeading
-          eyebrow="Customer Love"
+          eyebrow="Reviews"
           title="What Our Customers Say"
           subtitle="Real notes from the women who wear UMA."
         />
-        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        <div className="grid gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
           {reviews.map((review, i) => (
             <motion.figure
               key={review.id}
@@ -23,13 +23,13 @@ export function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col rounded-2xl border border-clay/60 bg-cream/50 p-6"
+              className="flex flex-col border-t border-clay/70 pt-7 lg:border-l lg:border-t-0 lg:pt-0 lg:pl-9 first:lg:border-l-0 first:lg:pl-0"
             >
               <Rating value={review.rating} />
               <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-charcoal/80">
                 “{review.text}”
               </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-clay/50 pt-5">
+              <figcaption className="mt-7 flex items-center gap-3">
                 {review.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

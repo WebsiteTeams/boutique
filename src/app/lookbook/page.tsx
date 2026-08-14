@@ -60,10 +60,10 @@ export default function LookbookPage() {
       <header className="border-b border-clay/50 bg-cream/50">
         <div className="mx-auto max-w-4xl px-5 pb-12 pt-32 text-center sm:px-8 lg:pt-40">
           <p className="eyebrow mb-3 text-gold-deep">The Lookbook</p>
-          <h1 className="serif-display text-4xl text-charcoal sm:text-5xl lg:text-6xl">
+          <h1 className="type-display-lg text-charcoal">
             Seasonal Moods, Editorial Wear
           </h1>
-          <p className="mx-auto mt-4 max-w-xl leading-relaxed text-mist">
+          <p className="mx-auto mt-4 max-w-xl type-body leading-relaxed text-mist">
             Styled looks from the current edit — discover how our weaves drape, pair and
             celebrate, then shop the look with one click.
           </p>
@@ -91,10 +91,10 @@ export default function LookbookPage() {
                 <span className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
                 <span className="absolute inset-x-6 bottom-6 flex flex-wrap items-end justify-between gap-3 text-left">
                   <span>
-                    <span className="serif-display block text-2xl text-ivory">{look.name}</span>
-                    <span className="mt-1 block max-w-sm text-sm text-ivory/80">{look.caption}</span>
+                    <span className="type-heading-lg block text-ivory">{look.name}</span>
+                    <span className="mt-1 block max-w-sm type-body-sm text-ivory/80">{look.caption}</span>
                   </span>
-                  <span className="rounded-full border border-ivory/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-charcoal">
+                  <span className="type-label-sm rounded-full border border-ivory/50 px-4 py-2 text-ivory backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-charcoal">
                     Shop the Look
                   </span>
                 </span>
@@ -115,7 +115,7 @@ export default function LookbookPage() {
                 key={c.id}
                 href="/collections"
                 variant="ghost"
-                className="group relative block overflow-hidden rounded-xl p-0"
+                className="group relative block overflow-hidden p-0"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -124,7 +124,7 @@ export default function LookbookPage() {
                   className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <span className="absolute inset-0 bg-charcoal/35 transition-colors group-hover:bg-charcoal/25" />
-                <span className="serif-display absolute inset-x-4 bottom-4 text-xl text-ivory">
+                <span className="type-heading-md absolute inset-x-4 bottom-4 text-ivory">
                   {c.name}
                 </span>
               </LinkButton>

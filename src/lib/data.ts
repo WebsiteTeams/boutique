@@ -481,7 +481,7 @@ export const categories: CategoryItem[] = [
   {
     id: "chudithars",
     name: "Chudithars",
-    description: "Everyday Elegance",
+    description: "Modern Tradition",
     image: P.categories.chudithars,
     cta: "Explore Collection",
     href: "/chudithars",

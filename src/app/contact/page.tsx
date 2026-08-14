@@ -56,7 +56,7 @@ export default function ContactPage() {
         </div>
 
         <form onSubmit={submit} className="rounded-2xl border border-clay/60 bg-white/60 p-6 sm:p-7">
-          <h2 className="serif-display mb-5 text-xl text-charcoal">Send a Message</h2>
+          <h2 className="type-heading-md mb-5 text-charcoal">Send a Message</h2>
           <div className="space-y-5">
             <Field label="Your Name" required>
               <TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Full name" required />

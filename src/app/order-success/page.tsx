@@ -28,7 +28,7 @@ function OrderSuccessInner() {
         <Check width={36} height={36} strokeWidth={2.5} />
       </motion.div>
 
-      <h1 className="serif-display mt-7 text-4xl text-charcoal sm:text-5xl">Thank you!</h1>
+      <h1 className="type-display-lg mt-7 text-charcoal">Thank you!</h1>
       <p className="mx-auto mt-4 max-w-md leading-relaxed text-mist">
         Your order <span className="font-medium text-charcoal">{order}</span> has been placed
         successfully. A confirmation email and SMS are on their way.
@@ -38,7 +38,7 @@ function OrderSuccessInner() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-mist">Order number</p>
-            <p className="serif-display mt-0.5 text-xl text-charcoal">{order}</p>
+            <p className="type-heading-md mt-0.5 text-charcoal">{order}</p>
           </div>
           <PackageCheck width={32} height={32} className="text-gold-deep" />
         </div>

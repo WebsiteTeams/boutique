@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Shop } from "@/components/shop/Shop";
+import { P } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Sarees",
@@ -13,6 +14,7 @@ export default function SareesPage() {
       title="Sarees"
       description="Handwoven silks, feather-light handlooms and designer drapes — a considered edit for weddings, festive evenings and every day in between."
       category="sarees"
+      image={P.categories.sarees}
     />
   );
 }

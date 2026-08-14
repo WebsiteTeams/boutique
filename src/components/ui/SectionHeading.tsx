@@ -42,7 +42,7 @@ export function SectionHeading({
       )}
       <h2
         className={cn(
-          "serif-display max-w-3xl text-3xl leading-[1.12] text-balance sm:text-4xl lg:text-[3.1rem] lg:leading-[1.08]",
+          "type-heading-xl max-w-3xl text-balance",
           dark ? "text-ivory" : "text-charcoal"
         )}
       >
@@ -51,7 +51,7 @@ export function SectionHeading({
       {subtitle && (
         <p
           className={cn(
-            "mt-5 max-w-xl text-[0.95rem] leading-[1.7]",
+            "mt-5 max-w-xl type-body",
             dark ? "text-ivory/70" : "text-mist",
             align === "center" && "text-center"
           )}

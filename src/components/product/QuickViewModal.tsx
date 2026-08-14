@@ -101,7 +101,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
       quantity: 1,
       customizable: product.customizable,
     });
-    showToast("Added to your bag", product.name);
+    showToast("Added to cart", product.name);
     onClose();
   };
 
@@ -145,8 +145,8 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           aria-label={`View image ${i + 1}`}
           aria-current={active === i}
           className={cn(
-            "relative h-[64px] w-[52px] shrink-0 overflow-hidden rounded-lg border bg-cream transition-all duration-300",
-            "lg:h-[88px] lg:w-[92px]",
+            "relative h-[64px] w-[52px] shrink-0 overflow-hidden border bg-cream transition-all duration-300",
+            "lg:h-[92px] lg:w-[100px]",
             active === i
               ? "border-gold-deep opacity-100"
               : "border-clay/70 opacity-75 hover:scale-[1.03] hover:opacity-100"
@@ -156,7 +156,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             src={src}
             alt=""
             fill
-            sizes="80px"
+            sizes="100px"
             loading="lazy"
             className="object-cover"
           />
@@ -191,9 +191,9 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
         exit="exit"
         className={cn(
           "relative flex w-full max-h-[94svh] flex-col overflow-hidden bg-ivory",
-          "rounded-t-3xl sm:max-w-xl sm:rounded-3xl",
+          "rounded-t-2xl sm:max-w-3xl sm:rounded-2xl",
           "shadow-[0_24px_80px_rgb(23_20_14/0.45)]",
-          "lg:grid lg:h-[min(720px,88vh)] lg:max-h-[88vh] lg:w-[min(1400px,99vw)] lg:grid-cols-[1.3fr_1fr] lg:rounded-3xl"
+          "lg:grid lg:h-[min(780px,90vh)] lg:max-h-[90vh] lg:w-[min(1500px,95vw)] lg:grid-cols-[1.4fr_1fr] lg:rounded-2xl"
         )}
       >
         {/* Close */}
@@ -206,7 +206,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           <X width={20} height={20} strokeWidth={1.5} />
         </button>
 
-        {/* ----- Image column (55–58%) ----- */}
+        {/* Image column */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -236,44 +236,43 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                   alt={`${product.name} — image ${active + 1}`}
                   fill
                   priority={active === 0}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 60vw, 100vw"
                   className="object-cover"
                 />
               </motion.div>
             </AnimatePresence>
 
-            {/* Badge */}
             {product.badge && (
               <div className="pointer-events-none absolute left-4 top-4 z-10">
                 <Badge type={product.badge} />
               </div>
             )}
 
-            {/* Counter */}
-            <div className="pointer-events-none absolute bottom-4 right-4 z-10 rounded-full bg-ink/45 px-3 py-1 text-[0.62rem] font-medium tabular-nums uppercase tracking-[0.2em] text-ivory backdrop-blur">
+            <div className="pointer-events-none absolute bottom-4 right-4 z-10 rounded-full bg-ink/45 px-3 py-1 type-label-sm tabular-nums text-ivory backdrop-blur">
               {String(active + 1).padStart(2, "0")} / {String(product.images.length).padStart(2, "0")}
             </div>
           </motion.div>
 
-          {/* Thumbnails */}
-          {renderThumbs("hidden gap-2.5 p-3 lg:flex lg:flex-col lg:overflow-y-auto no-scrollbar")}
+          {/* Thumbnails - Desktop */}
+          {renderThumbs("hidden gap-3 p-4 lg:flex lg:flex-col lg:overflow-y-auto no-scrollbar")}
+
+          {/* Thumbnails - Mobile */}
           {renderThumbs("flex gap-2.5 overflow-x-auto px-4 py-3 lg:hidden no-scrollbar")}
         </motion.div>
 
-        {/* ----- Info column (42–45%) ----- */}
+        {/* Info column */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18, duration: 0.5, ease: EASE }}
-          className="flex min-h-0 flex-1 flex-col overflow-y-auto border-t border-clay/50 bg-ivory p-5 pb-8 sm:p-7 lg:h-full lg:border-l lg:border-t-0 lg:p-9"
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto border-t border-clay/50 bg-ivory p-5 pb-8 sm:p-8 lg:h-full lg:border-l lg:border-t-0 lg:p-10"
         >
-          <p className="text-[0.72rem] font-medium uppercase tracking-[0.2em] text-gold-deep">
+          <p className="type-label-sm text-gold-deep">
             {product.category}
           </p>
 
-          {/* Title + wishlist */}
-          <div className="mt-2 flex items-start justify-between gap-4">
-            <h3 className="serif-display text-[1.7rem] leading-[1.05] text-charcoal sm:text-[2rem] lg:text-[2.35rem]">
+          <div className="mt-2.5 flex items-start justify-between gap-4">
+            <h3 className="type-title-qv text-charcoal">
               {product.name}
             </h3>
             <button
@@ -291,20 +290,19 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             </button>
           </div>
 
-          <Rating value={product.rating} count={product.reviewCount} size={13} className="mt-2.5" />
+          <Rating value={product.rating} count={product.reviewCount} size={13} className="mt-3" />
 
-          {/* Price */}
-          <div className="mt-4 flex flex-wrap items-baseline gap-2.5">
-            <span className="text-2xl font-medium tabular-nums text-charcoal lg:text-[1.65rem]">
+          <div className="mt-5 flex flex-wrap items-baseline gap-3">
+            <span className="type-price-lg text-charcoal">
               {formatINR(product.price)}
             </span>
             {product.mrp && product.mrp > product.price && (
               <>
-                <span className="text-sm tabular-nums text-taupe line-through">
+                <span className="type-price-sm tabular-nums text-muted line-through">
                   {formatINR(product.mrp)}
                 </span>
                 {off && (
-                  <span className="rounded-full bg-gold/15 px-2.5 py-0.5 text-[0.68rem] font-medium tracking-[0.08em] text-gold-deep">
+                  <span className="rounded-full bg-gold/15 px-2.5 py-0.5 type-label-sm text-gold-deep">
                     {off}% OFF
                   </span>
                 )}
@@ -312,37 +310,34 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             )}
           </div>
 
-          {/* Description */}
-          <p className="mt-4 text-sm leading-relaxed text-mist line-clamp-3">
+          <p className="mt-5 type-body text-mist line-clamp-3">
             {product.description}
           </p>
           {showReadMore && (
             <Link
               href={`/product/${product.slug}`}
               onClick={onClose}
-              className="mt-1.5 inline-flex items-center gap-1 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-gold-deep transition-colors hover:text-charcoal"
+              className="mt-2 inline-flex items-center gap-1 type-label-sm text-gold-deep transition-colors hover:text-charcoal"
             >
               Read more
               <ArrowRight width={12} height={12} />
             </Link>
           )}
 
-          {/* Metadata blocks */}
-          <div className="mt-5 border-t border-clay/60 pt-4">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          <div className="mt-6 border-t border-clay/60 pt-5">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5">
               {details.map(([label, value]) => (
                 <div key={label}>
-                  <p className="text-[0.6rem] font-medium uppercase tracking-[0.2em] text-gold-deep/80">
+                  <p className="type-label-sm text-gold-deep/80">
                     {label}
                   </p>
-                  <p className="mt-0.5 text-[0.85rem] text-charcoal">{value}</p>
+                  <p className="mt-1 text-[0.9rem] text-charcoal">{value}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Availability */}
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-5 flex items-center gap-2">
             <span
               className={cn(
                 "h-1.5 w-1.5 rounded-full",
@@ -351,7 +346,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             />
             <p
               className={cn(
-                "text-[0.8rem]",
+                "type-meta",
                 product.inStock ? "text-charcoal/80" : "text-red-600"
               )}
             >
@@ -359,20 +354,19 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             </p>
           </div>
 
-          {/* Size */}
           {product.sizes && (
-            <div className="mt-5">
-              <p className="mb-2.5 text-[0.62rem] font-medium uppercase tracking-[0.2em] text-charcoal/60">
+            <div className="mt-6">
+              <p className="mb-3 type-label-sm text-charcoal/60">
                 Size
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {product.sizes.map((s) => (
                   <button
                     key={s}
                     onClick={() => setSize(s)}
                     aria-pressed={size === s}
                     className={cn(
-                      "h-9 min-w-9 rounded-full border px-3 text-[0.78rem] font-medium transition-all duration-200",
+                      "h-10 min-w-10 rounded-full border px-3.5 text-[0.78rem] font-medium transition-all duration-200",
                       size === s
                         ? "border-charcoal bg-charcoal text-ivory"
                         : "border-clay text-charcoal/80 hover:border-charcoal hover:text-charcoal"
@@ -385,23 +379,21 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             </div>
           )}
 
-          {/* CTA */}
           <Button
             onClick={add}
             size="lg"
             fullWidth
-            className="mt-5"
+            className="mt-7 p-3"
             disabled={!product.inStock}
           >
             <ShoppingBag width={17} height={17} strokeWidth={1.8} />
             {product.inStock ? "Add to Cart" : "Out of Stock"}
           </Button>
 
-          {/* View full details */}
           <Link
             href={`/product/${product.slug}`}
             onClick={onClose}
-            className="group relative mt-5 inline-flex items-center justify-center gap-2 self-center text-[0.7rem] font-medium uppercase tracking-[0.2em] text-charcoal/70 transition-colors hover:text-charcoal"
+            className="group relative mt-6 inline-flex items-center justify-center gap-2 self-center type-label-sm text-charcoal/70 transition-colors hover:text-charcoal"
           >
             View Full Details
             <ArrowRight
@@ -412,11 +404,10 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-gold-deep transition-transform duration-300 group-hover:scale-x-100" />
           </Link>
 
-          {/* Trust */}
-          <ul className="mt-6 space-y-2 border-t border-clay/60 pt-5">
+          <ul className="mt-7 space-y-2.5 border-t border-clay/60 pt-6">
             {trust.map((t) => (
-              <li key={t} className="flex items-center gap-2.5 text-[0.7rem] text-taupe">
-                <Check width={13} height={13} strokeWidth={1.8} className="shrink-0 text-gold-deep" />
+              <li key={t} className="flex items-center gap-2.5 text-[0.75rem] text-taupe">
+                <Check width={14} height={14} strokeWidth={1.8} className="shrink-0 text-gold-deep" />
                 {t}
               </li>
             ))}

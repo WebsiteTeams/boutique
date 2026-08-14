@@ -61,3 +61,23 @@ export function YoutubeIcon({ size = 18, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function WhatsAppIcon({ size = 18, ...props }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
+    >
+      <path d="M3 21l1.7-4.6A8.5 8.5 0 1 1 8.6 19.3L3 21z" />
+      <path d="M8.8 8.4c-.3 1.4.4 3 1.7 4.3 1.2 1.2 2.7 2 4.2 1.8.5-.1.9-.5 1.1-1l.3-.8-2-1-.7.5c-.6-.4-1.2-1-1.5-1.6l.4-.7-1-1.9c-.4.2-.7.3-1 .5-.5.3-.8.8-1.5 1.2z" />
+    </svg>
+  );
+}

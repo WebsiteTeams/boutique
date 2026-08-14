@@ -36,7 +36,7 @@ export function BrandStory() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 1.1, ease }}
-          className="relative order-2 overflow-hidden rounded-2xl lg:order-1"
+          className="relative order-2 overflow-hidden lg:order-1"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -46,7 +46,7 @@ export function BrandStory() {
             className="aspect-[4/5] w-full object-cover"
           />
           <div className="absolute bottom-5 left-5 rounded-full bg-ivory/90 px-4 py-2 backdrop-blur">
-            <p className="text-[0.62rem] font-medium uppercase tracking-[0.2em] text-charcoal">
+            <p className="type-label-sm text-charcoal">
               Est. 2012 · Chennai
             </p>
           </div>
@@ -64,12 +64,12 @@ export function BrandStory() {
               <span className="h-px w-10 bg-gold" />
               Our Story
             </p>
-            <h2 className="serif-display text-4xl leading-[1.1] text-balance sm:text-[2.9rem]">
-              Crafted with <em className="text-gold-deep">intention</em>,
+            <h2 className="type-display-lg text-balance">
+              Where Tradition Meets
               <br className="hidden sm:block" />
-              worn with pride
+              <em className="text-gold-deep">Modern Elegance</em>
             </h2>
-            <p className="mt-6 max-w-[46ch] text-[0.97rem] leading-relaxed text-mist">
+            <p className="mt-6 max-w-[46ch] type-body text-mist">
               UMA began as a single tailoring table and a quiet obsession with the drape
               of a good saree. Today we curate handwoven pieces from looms across India —
               every order still handled with the same care as the first one.

@@ -62,7 +62,7 @@ export default function AccountPage() {
           MK
         </span>
         <div>
-          <h1 className="serif-display text-3xl text-charcoal">{PROFILE.name}</h1>
+          <h1 className="type-heading-lg text-charcoal">{PROFILE.name}</h1>
           <p className="mt-0.5 flex items-center gap-1.5 text-sm text-mist">
             <BadgeCheck width={14} height={14} className="text-gold-deep" />
             {PROFILE.email} · Member since {PROFILE.memberSince}
@@ -97,7 +97,7 @@ export default function AccountPage() {
             className="rounded-2xl border border-clay/60 bg-white/60 p-6 text-left"
           >
             <PackageCheck width={22} height={22} className="text-gold-deep" />
-            <p className="serif-display mt-3 text-3xl text-charcoal">{orders.length}</p>
+            <p className="type-heading-lg mt-3 text-charcoal">{orders.length}</p>
             <p className="text-sm text-mist">Total orders</p>
           </LinkButton>
           <LinkButton
@@ -106,19 +106,19 @@ export default function AccountPage() {
             className="rounded-2xl border border-clay/60 bg-white/60 p-6 text-left"
           >
             <Heart width={22} height={22} className="text-gold-deep" />
-            <p className="serif-display mt-3 text-3xl text-charcoal">{wishlist.length}</p>
+            <p className="type-heading-lg mt-3 text-charcoal">{wishlist.length}</p>
             <p className="text-sm text-mist">Saved to wishlist</p>
           </LinkButton>
           <div className="rounded-2xl border border-clay/60 bg-white/60 p-6">
             <Wallet width={22} height={22} className="text-gold-deep" />
-            <p className="serif-display mt-3 text-3xl text-charcoal">
+            <p className="type-heading-lg mt-3 text-charcoal">
               {formatINR(orders.reduce((s, o) => s + o.total, 0))}
             </p>
             <p className="text-sm text-mist">Lifetime spend</p>
           </div>
 
           <div className="sm:col-span-2 lg:col-span-3">
-            <h2 className="serif-display mb-4 text-2xl text-charcoal">Recent Orders</h2>
+            <h2 className="type-heading-md mb-4 text-charcoal">Recent Orders</h2>
             <ul className="grid gap-4 lg:grid-cols-3">
               {orders.slice(0, 3).map((o) => (
                 <li key={o.id} className="rounded-2xl border border-clay/60 bg-white/60 p-5">

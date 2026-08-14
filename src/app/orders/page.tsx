@@ -23,7 +23,7 @@ export default function OrdersPage() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 pb-20 pt-32 sm:px-8 lg:px-10 lg:pt-40">
-      <h1 className="serif-display mb-2 text-4xl text-charcoal">Order Tracking</h1>
+      <h1 className="type-heading-xl mb-2 text-charcoal">Order Tracking</h1>
       <p className="mb-8 max-w-lg text-mist">
         Follow your saree, chudithar or bespoke blouse from our atelier to your doorstep.
       </p>
@@ -100,7 +100,7 @@ export default function OrdersPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-mist">Order</p>
-                <h2 className="serif-display text-2xl text-charcoal">{active.id}</h2>
+                <h2 className="type-heading-md text-charcoal">{active.id}</h2>
               </div>
               <div className="rounded-full bg-cream px-4 py-2 text-sm font-medium text-gold-deep">
                 {active.status}

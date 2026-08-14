@@ -18,11 +18,11 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("group relative overflow-hidden rounded-2xl", className)}
+      className={cn("group relative overflow-hidden bg-ink", className)}
     >
       <Link
         href={category.href}
-        className="relative block aspect-[3/4] overflow-hidden sm:aspect-[4/5]"
+        className="relative block h-full w-full overflow-hidden"
         aria-label={category.name}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -30,22 +30,23 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
           src={category.image}
           alt={category.name}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent transition-colors duration-500 group-hover:from-ink/85" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent transition-colors duration-500 group-hover:from-ink/90" />
 
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
-          <p className="eyebrow mb-2 text-gold-soft">{category.name.toUpperCase()}</p>
-          <h3 className="serif-display max-w-[16ch] text-2xl leading-tight text-ivory sm:text-[1.8rem]">
+        <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+          <p className="eyebrow mb-3 flex items-center gap-3 text-gold-soft">
+            <span className="h-px w-8 bg-gold-soft/70" />
+            {category.name}
+          </p>
+          <h3 className="type-heading-lg max-w-[16ch] text-ivory">
             {category.description}
           </h3>
-          <span className="mt-4 inline-flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-ivory/90">
+          <span className="mt-5 inline-flex items-center gap-2 type-btn text-ivory/90">
             {category.cta}
-            <ArrowUpRight
-              width={15}
-              height={15}
-              className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-ivory/30 transition-all duration-300 group-hover:border-ivory group-hover:bg-ivory group-hover:text-charcoal">
+              <ArrowUpRight width={15} height={15} />
+            </span>
           </span>
         </div>
       </Link>

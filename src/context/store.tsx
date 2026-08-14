@@ -31,7 +31,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (title: string, description?: string, variant: ToastMessage["variant"] = "success") => {
       const id = Date.now() + Math.random();
       setToasts((prev) => [...prev, { id, title, description, variant }]);
-      setTimeout(() => dismiss(id), 3800);
+      setTimeout(() => dismiss(id), 2600);
     },
     [dismiss]
   );
@@ -86,7 +86,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, item];
     });
-    setIsOpen(true);
   }, []);
 
   const removeItem = useCallback((key: string) => {
@@ -117,7 +116,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       customization,
     };
     setItems((prev) => [...prev, base]);
-    setIsOpen(true);
   }, []);
 
   const { count, subtotal } = useMemo(() => {

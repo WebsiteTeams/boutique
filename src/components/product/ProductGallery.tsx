@@ -33,7 +33,7 @@ export function ProductGallery({ images, name, className }: ProductGalleryProps)
             key={i}
             onClick={() => setActive(i)}
             className={cn(
-              "relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-cream transition-all duration-300 sm:h-[5.5rem]",
+              "relative h-20 w-16 shrink-0 overflow-hidden bg-cream transition-all duration-300 sm:h-[5.5rem]",
               active === i
                 ? "ring-2 ring-gold ring-offset-2 ring-offset-ivory"
                 : "opacity-70 hover:opacity-100"
@@ -52,7 +52,7 @@ export function ProductGallery({ images, name, className }: ProductGalleryProps)
         onMouseEnter={() => setZoom(true)}
         onMouseLeave={() => setZoom(false)}
         onMouseMove={handleMove}
-        className="relative flex-1 cursor-zoom-in overflow-hidden rounded-xl bg-cream"
+        className="relative flex-1 cursor-zoom-in overflow-hidden bg-cream"
       >
         <motion.div
           key={active}
@@ -73,7 +73,7 @@ export function ProductGallery({ images, name, className }: ProductGalleryProps)
           />
         </motion.div>
 
-        <div className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-ink/50 px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-ivory backdrop-blur">
+        <div className="type-label-sm pointer-events-none absolute bottom-4 right-4 rounded-full bg-ink/50 px-3 py-1 text-ivory backdrop-blur">
           {active + 1} / {images.length}
         </div>
       </div>

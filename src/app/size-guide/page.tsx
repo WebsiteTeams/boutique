@@ -19,7 +19,7 @@ export default function SizeGuidePage() {
     >
       <section className="overflow-hidden rounded-2xl border border-clay/60 bg-white/60">
         <div className="border-b border-clay/60 bg-cream/70 px-6 py-4">
-          <h2 className="serif-display text-lg text-charcoal">Chudithar Size Chart</h2>
+          <h2 className="type-heading-md text-charcoal">Chudithar Size Chart</h2>
           <p className="mt-0.5 text-xs text-mist">All measurements in inches</p>
         </div>
         <div className="overflow-x-auto">
@@ -49,7 +49,7 @@ export default function SizeGuidePage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="serif-display mb-4 text-xl text-charcoal">How to Measure</h2>
+        <h2 className="type-heading-md mb-4 text-charcoal">How to Measure</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {TIPS.map((t) => (
             <div key={t.k} className="flex gap-4 rounded-xl border border-clay/60 bg-white/60 p-5">
@@ -66,7 +66,7 @@ export default function SizeGuidePage() {
       </section>
 
       <section className="mt-10 rounded-2xl bg-cream/70 p-6">
-        <h2 className="serif-display text-lg text-charcoal">Not sure about sizes?</h2>
+        <h2 className="type-heading-md text-charcoal">Not sure about sizes?</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-mist">
           For sarees, the blouse piece and saree are one-size with generous allowance. For
           bespoke blouses we stitch around <em>your</em> measurements — no chart required.

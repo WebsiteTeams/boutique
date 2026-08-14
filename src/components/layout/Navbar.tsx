@@ -15,9 +15,8 @@ const NAV_LINKS = [
   { label: "Sarees", href: "/sarees" },
   { label: "Chudithars", href: "/chudithars" },
   { label: "Custom Blouse", href: "/custom-blouse" },
-  { label: "New Arrivals", href: "/new-arrivals" },
   { label: "Collections", href: "/collections" },
-  { label: "About", href: "/about" },
+  { label: "Lookbook", href: "/lookbook" },
 ];
 
 export function Navbar() {
@@ -50,49 +49,26 @@ export function Navbar() {
   return (
     <>
       <motion.header
-        animate={{ height: solid ? 64 : 88 }}
+        animate={{ height: solid ? 64 : 84 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           "fixed inset-x-0 top-0 z-50",
           solid
-            ? "border-b border-clay/50 bg-ivory/90 shadow-soft backdrop-blur-md"
+            ? "border-b border-clay/60 bg-ivory/85 shadow-soft backdrop-blur-md"
             : "border-b border-transparent bg-transparent"
         )}
       >
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
-          {/* Mobile: left icons */}
-          <div className="flex items-center gap-1 lg:hidden">
-            <button
-              onClick={() => setSearchOpen(true)}
-              className={cn(
-                "rounded-full p-2.5 transition-colors",
-                onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
-              )}
-              aria-label="Search"
-            >
-              <Search width={20} height={20} />
-            </button>
-            <Link
-              href="/wishlist"
-              className={cn(
-                "relative rounded-full p-2.5 transition-colors",
-                onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
-              )}
-              aria-label="Wishlist"
-            >
-              <Heart width={20} height={20} />
-              {wishlist.length > 0 && (
-                <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[0.6rem] font-medium text-white">
-                  {wishlist.length}
-                </span>
-              )}
-            </Link>
+        <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
+          {/* Left: brand */}
+          <div className="flex min-w-0 shrink-0 items-center">
+            <Logo dark={onDark} />
           </div>
 
-          <Logo className="lg:mr-6" compact dark={onDark} />
-
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-7 lg:flex xl:gap-9" aria-label="Primary">
+          {/* Center: desktop nav (truly centered, independent of side content) */}
+          <nav
+            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 whitespace-nowrap lg:flex xl:gap-8"
+            aria-label="Primary"
+          >
             {NAV_LINKS.map((link) => {
               const active =
                 link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -101,7 +77,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "relative py-1 text-[0.72rem] font-medium uppercase tracking-[0.18em] transition-colors",
+                    "relative whitespace-nowrap py-1 type-nav transition-colors",
                     active
                       ? onDark
                         ? "text-gold-soft"
@@ -124,29 +100,29 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Right icons */}
-          <div className="flex items-center gap-1">
+          {/* Right: actions */}
+          <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
             <button
               onClick={() => setSearchOpen(true)}
               className={cn(
-                "hidden rounded-full p-2.5 transition-colors lg:block",
+                "shrink-0 rounded-full p-2.5 transition-colors",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
               aria-label="Search"
             >
-              <Search width={20} height={20} />
+              <Search width={19} height={19} />
             </button>
             <Link
               href="/wishlist"
               className={cn(
-                "relative hidden rounded-full p-2.5 transition-colors lg:block",
+                "relative hidden shrink-0 rounded-full p-2.5 transition-colors sm:flex",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
               aria-label="Wishlist"
             >
-              <Heart width={20} height={20} />
+              <Heart width={19} height={19} />
               {wishlist.length > 0 && (
-                <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[0.6rem] font-medium text-white">
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[0.58rem] font-medium text-white">
                   {wishlist.length}
                 </span>
               )}
@@ -154,28 +130,28 @@ export function Navbar() {
             <Link
               href="/account"
               className={cn(
-                "hidden rounded-full p-2.5 transition-colors lg:block",
+                "hidden shrink-0 rounded-full p-2.5 transition-colors sm:flex",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
               aria-label="Account"
             >
-              <User width={20} height={20} />
+              <User width={19} height={19} />
             </Link>
             <button
               onClick={openCart}
               className={cn(
-                "relative rounded-full p-2.5 transition-colors",
+                "relative shrink-0 rounded-full p-2.5 transition-colors",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
               aria-label="Open cart"
             >
-              <ShoppingBag width={20} height={20} />
+              <ShoppingBag width={19} height={19} />
               {count > 0 && (
                 <motion.span
                   key={count}
                   initial={{ scale: 0.5 }}
                   animate={{ scale: 1 }}
-                  className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-charcoal text-[0.6rem] font-medium text-ivory"
+                  className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-charcoal text-[0.58rem] font-medium text-ivory"
                 >
                   {count}
                 </motion.span>
@@ -184,12 +160,12 @@ export function Navbar() {
             <button
               onClick={() => setMenuOpen(true)}
               className={cn(
-                "rounded-full p-2.5 transition-colors lg:hidden",
+                "shrink-0 rounded-full p-2.5 transition-colors lg:hidden",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
               aria-label="Open menu"
             >
-              <Menu width={22} height={22} />
+              <Menu width={21} height={21} />
             </button>
           </div>
         </div>

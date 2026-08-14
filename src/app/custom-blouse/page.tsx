@@ -13,10 +13,10 @@ export default function CustomBlousePage() {
       <header className="border-b border-clay/50 bg-cream/50">
         <div className="mx-auto max-w-5xl px-5 pb-10 pt-32 text-center sm:px-8 lg:pt-20 lg:pb-14">
           <p className="eyebrow mb-3 text-gold-deep">Bespoke Atelier</p>
-          <h1 className="serif-display text-4xl text-charcoal sm:text-5xl lg:text-6xl">
+          <h1 className="type-display-lg text-charcoal">
             Design Your Perfect Blouse
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed text-mist">
+          <p className="mx-auto mt-4 max-w-xl type-body text-mist">
             A four-step tailoring experience — from your first idea to a blouse stitched
             to your exact measurements by master hands.
           </p>
