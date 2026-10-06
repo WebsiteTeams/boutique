@@ -1,12 +1,13 @@
-import { products } from "@/lib/data";
+import { listProducts } from "@/server/services/products";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProductCarousel } from "@/components/product/ProductCarousel";
 
-export function BestSellers() {
-  const bestsellers = products.filter((p) => p.isBestSeller);
+export async function BestSellers() {
+  const bestsellers = await listProducts({ isBestseller: true, sort: "popular", limit: 10 });
+  if (bestsellers.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1440px] px-0 py-20 sm:px-0 lg:py-32">
+    <section className="mx-auto max-w-[1440px] py-20 lg:py-32">
       <div className="px-5 sm:px-8 lg:px-10">
         <SectionHeading
           eyebrow="Most Loved"

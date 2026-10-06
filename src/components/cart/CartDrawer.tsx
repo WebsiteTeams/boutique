@@ -4,7 +4,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ShoppingBag, Truck, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FREE_DELIVERY_THRESHOLD, getProductById } from "@/lib/data";
+import { useRef } from "react";
+import { cartItemHref } from "@/lib/cart";
+import { FREE_DELIVERY_THRESHOLD } from "@/lib/pricing";
+import { useDialog } from "@/lib/use-dialog";
 import { useCart } from "@/context/store";
 import { cn, formatINR } from "@/lib/utils";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
@@ -13,6 +16,8 @@ import { Button, LinkButton } from "@/components/ui/Button";
 export function CartDrawer() {
   const { items, isOpen, closeCart, subtotal, updateQuantity, removeItem, count } = useCart();
   const router = useRouter();
+  const panelRef = useRef<HTMLElement>(null);
+  useDialog(isOpen, panelRef, closeCart);
 
   const remaining = Math.max(0, FREE_DELIVERY_THRESHOLD - subtotal);
   const progress = Math.min(100, (subtotal / FREE_DELIVERY_THRESHOLD) * 100);
@@ -32,8 +37,12 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
             className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-ivory"
-            aria-label="Shopping cart"
+            aria-label="Shopping bag"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-clay/60 px-6 py-5">
@@ -105,7 +114,7 @@ export function CartDrawer() {
                         className="flex gap-4 py-5"
                       >
                         <Link
-                          href={`/product/${getProductById(item.productId)?.slug ?? "bespoke-silk-custom-blouse"}`}
+                          href={cartItemHref(item)}
                           onClick={closeCart}
                           className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-cream"
                         >
@@ -116,7 +125,7 @@ export function CartDrawer() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <Link
-                                href={`/product/${getProductById(item.productId)?.slug ?? "bespoke-silk-custom-blouse"}`}
+                                href={cartItemHref(item)}
                                 onClick={closeCart}
                                 className="block truncate text-sm font-medium text-charcoal hover:text-gold-deep"
                               >
@@ -130,6 +139,7 @@ export function CartDrawer() {
                             <button
                               onClick={() => removeItem(item.key)}
                               className="shrink-0 text-xs text-taupe underline underline-offset-4 hover:text-charcoal"
+                              aria-label={`Remove ${item.name}`}
                             >
                               Remove
                             </button>
@@ -138,6 +148,7 @@ export function CartDrawer() {
                             <QuantityStepper
                               size="sm"
                               value={item.quantity}
+                              max={item.customization ? 1 : 20}
                               onChange={(q) => updateQuantity(item.key, q)}
                             />
                             <span className="text-sm font-medium tabular-nums text-charcoal">

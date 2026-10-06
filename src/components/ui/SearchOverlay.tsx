@@ -3,8 +3,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Search, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { products } from "@/lib/data";
+import { useEffect, useRef, useState } from "react";
+import type { Product } from "@/types";
+import { api } from "@/lib/api";
+import { useDialog } from "@/lib/use-dialog";
+import { formatINR } from "@/lib/utils";
 
 interface SearchOverlayProps {
   open: boolean;
@@ -15,38 +18,46 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState("");
   const [wasOpen, setWasOpen] = useState(open);
 
+  const [results, setResults] = useState<Product[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const panelRef = useRef<HTMLDivElement>(null);
+
   if (open !== wasOpen) {
     setWasOpen(open);
-    if (!open) setQuery("");
+    if (!open) {
+      setQuery("");
+      setResults([]);
+      setStatus("idle");
+    }
   }
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [open, onClose]);
+  useDialog(open, panelRef, onClose);
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return products
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.includes(q) ||
-          p.fabric.toLowerCase().includes(q) ||
-          p.occasion.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.includes(q))
-      )
-      .slice(0, 6);
-  }, [query]);
+  const term = query.trim();
+
+  // Debounced catalog search against the products API.
+  useEffect(() => {
+    if (!term) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setStatus("loading");
+      api<{ products: Product[] }>(`/api/products?limit=6&q=${encodeURIComponent(term)}`, {
+        signal: controller.signal,
+      })
+        .then((res) => {
+          setResults(res.products);
+          setStatus("done");
+        })
+        .catch((error) => {
+          if (error instanceof DOMException && error.name === "AbortError") return;
+          setStatus("error");
+        });
+    }, 220);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [term]);
 
   const suggestions = ["Banarasi", "Linen", "Chudithar", "Custom Blouse", "Organza"];
 
@@ -65,7 +76,11 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -40, opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-x-0 top-0 bg-ivory"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search products"
+            className="absolute inset-x-0 top-0 max-h-full overflow-y-auto bg-ivory"
           >
             <div className="mx-auto max-w-3xl px-6 py-8 sm:py-10">
               <div className="flex items-center gap-4 border-b-2 border-charcoal pb-3">
@@ -102,6 +117,15 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                     ))}
                   </div>
                 </div>
+              ) : status === "error" ? (
+                <div className="py-10 text-center" role="alert">
+                  <p className="type-heading-md text-charcoal">Search is unavailable</p>
+                  <p className="mt-2 text-sm text-mist">Please try again in a moment.</p>
+                </div>
+              ) : status !== "done" ? (
+                <p className="py-10 text-center text-sm text-mist" role="status">
+                  Searching…
+                </p>
               ) : results.length === 0 ? (
                 <div className="py-10 text-center">
                   <p className="type-heading-md text-charcoal">No results found</p>
@@ -110,6 +134,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                   </p>
                 </div>
               ) : (
+                <>
                 <ul className="mt-4 divide-y divide-clay/60">
                   {results.map((p) => (
                     <li key={p.id}>
@@ -131,13 +156,22 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                           </span>
                         </span>
                         <span className="text-sm tabular-nums text-gold-deep">
-                          ₹{p.price.toLocaleString("en-IN")}
+                          {formatINR(p.price)}
                         </span>
                         <ArrowRight className="h-4 w-4 text-charcoal/40 transition-transform group-hover:translate-x-1" />
                       </Link>
                     </li>
                   ))}
                 </ul>
+                <Link
+                  href={`/shop?q=${encodeURIComponent(term)}`}
+                  onClick={onClose}
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-gold-deep underline underline-offset-4"
+                >
+                  View all results
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                </>
               )}
             </div>
           </motion.div>

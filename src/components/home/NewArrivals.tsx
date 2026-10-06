@@ -1,11 +1,12 @@
-import { products } from "@/lib/data";
+import { listProducts } from "@/server/services/products";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LinkButton } from "@/components/ui/Button";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ArrowRight } from "lucide-react";
 
-export function NewArrivals() {
-  const arrivals = products.filter((p) => p.isNew).slice(0, 4);
+export async function NewArrivals() {
+  const arrivals = await listProducts({ isNew: true, limit: 4 });
+  if (arrivals.length === 0) return null;
 
   return (
     <section className="bg-cream/60">

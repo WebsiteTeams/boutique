@@ -1,17 +1,19 @@
 "use client";
 
-import { CartProvider, ToastProvider, WishlistProvider } from "@/context/store";
+import { AuthProvider, CartProvider, ToastProvider, WishlistProvider } from "@/context/store";
 import { ToastViewport } from "@/components/ui/ToastViewport";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
-      <WishlistProvider>
-        <CartProvider>
-          {children}
-          <ToastViewport />
-        </CartProvider>
-      </WishlistProvider>
+      <AuthProvider>
+        <WishlistProvider>
+          <CartProvider>
+            {children}
+            <ToastViewport />
+          </CartProvider>
+        </WishlistProvider>
+      </AuthProvider>
     </ToastProvider>
   );
 }

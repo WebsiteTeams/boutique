@@ -1,6 +1,6 @@
-"use client";
-
-import { collections, products } from "@/lib/data";
+import { pageMetadata } from "@/lib/seo";
+import { listCollections } from "@/server/services/admin";
+import { listProducts } from "@/server/services/products";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LinkButton } from "@/components/ui/Button";
@@ -52,7 +52,18 @@ const LOOKS = [
   },
 ];
 
-export default function LookbookPage() {
+export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Lookbook",
+  description:
+    "Styled looks from the current UMA Designers edit — see how our sarees and chudithars drape, pair and celebrate, then shop the look.",
+  path: "/lookbook",
+  image: "/images/collections/collection-bridal.png",
+});
+
+export default async function LookbookPage() {
+  const [products, collections] = await Promise.all([listProducts(), listCollections()]);
   const shot = (name: string) => products.find((p) => p.name === name);
 
   return (
@@ -75,7 +86,7 @@ export default function LookbookPage() {
           {LOOKS.map((look) => (
             <RevealItem key={look.id} className={look.wide ? "sm:col-span-2" : ""}>
               <LinkButton
-                href={shot(look.product)?.slug ? `/product/${shot(look.product)?.slug}` : "/sarees"}
+                href={shot(look.product) ? `/product/${shot(look.product)?.slug}` : "/shop"}
                 variant="ghost"
                 className="group relative block w-full overflow-hidden rounded-2xl p-0"
               >
@@ -113,7 +124,7 @@ export default function LookbookPage() {
             {collections.map((c) => (
               <LinkButton
                 key={c.id}
-                href="/collections"
+                href={`/collections/${c.id}`}
                 variant="ghost"
                 className="group relative block overflow-hidden p-0"
               >

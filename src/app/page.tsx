@@ -8,6 +8,11 @@ import { BrandStory } from "@/components/home/BrandStory";
 import { Testimonials } from "@/components/home/Testimonials";
 import { InstagramFeed } from "@/components/home/InstagramFeed";
 import { ServicePerks } from "@/components/home/ServicePerks";
+import { ShopByOccasion } from "@/components/home/ShopByOccasion";
+import { RecentlyViewed, RecommendedForYou } from "@/components/product/ProductShelf";
+
+// The home page shows live catalog data (stock, new arrivals, bestsellers).
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
@@ -16,11 +21,14 @@ export default function HomePage() {
       <ServicePerks />
       <FeaturedCategories />
       <SareeEdit />
+      <ShopByOccasion />
       <BestSellers />
       <CustomBlouseFeature />
       <Lookbook />
+      <RecommendedForYou />
       <BrandStory />
       <Testimonials />
+      <RecentlyViewed />
       <InstagramFeed />
     </>
   );

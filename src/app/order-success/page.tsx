@@ -1,138 +1,121 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, Mail, MessageSquareText, PackageCheck, Phone } from "lucide-react";
+import { motion } from "framer-motion";
+import { AlertCircle, Check, Clock, Mail, PackageCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { Button, LinkButton } from "@/components/ui/Button";
+import { Suspense } from "react";
+import type { Order } from "@/types";
+import { siteConfig } from "@/lib/config";
+import { paymentMethodLabel } from "@/lib/status";
+import { useApi } from "@/lib/use-api";
+import { LinkButton } from "@/components/ui/Button";
+import { OrderDetails } from "@/components/order/OrderDetails";
 
 function OrderSuccessInner() {
-  const params = useSearchParams();
-  const order = params.get("order") ?? "UMA-000000";
-  const [trackOpen, setTrackOpen] = useState(false);
-  const email = "orders@umadesigners.in";
+  const orderId = useSearchParams().get("order");
+  const { data, error, loading } = useApi<{ order: Order }>(
+    orderId ? `/api/orders/${encodeURIComponent(orderId)}` : null
+  );
+  const order = data?.order;
 
-  const copy = () => {
-    navigator.clipboard?.writeText(email);
-  };
+  if (!orderId || error) {
+    return (
+      <div className="mx-auto max-w-xl px-5 pb-20 pt-32 text-center sm:px-8 lg:pt-40">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cream text-gold-deep">
+          <AlertCircle width={26} height={26} />
+        </span>
+        <h1 className="type-heading-xl mt-6 text-charcoal">We couldn&apos;t find that order</h1>
+        <p className="mt-3 text-mist">
+          {error?.status === 401
+            ? "Please sign in to view your order."
+            : "The link may be incomplete. You can find all your orders in your account."}
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          {error?.status === 401 ? (
+            <LinkButton href={`/login?next=${encodeURIComponent(`/order-success?order=${orderId ?? ""}`)}`}>
+              Sign In
+            </LinkButton>
+          ) : (
+            <LinkButton href="/orders">View My Orders</LinkButton>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (loading || !order) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 pb-20 pt-32 sm:px-8 lg:pt-40" aria-busy="true">
+        <div className="mx-auto h-20 w-20 animate-pulse rounded-full bg-cream" />
+        <div className="mx-auto mt-8 h-64 animate-pulse rounded-2xl bg-cream/70" />
+      </div>
+    );
+  }
+
+  const awaitingPayment = order.paymentMethod !== "cod" && order.paymentStatus !== "Paid";
 
   return (
-    <div className="mx-auto max-w-2xl px-5 pb-20 pt-32 text-center sm:px-8 lg:pt-40">
-      <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gold text-white shadow-lg shadow-gold-soft/40"
-      >
-        <Check width={36} height={36} strokeWidth={2.5} />
-      </motion.div>
+    <div className="mx-auto max-w-2xl px-5 pb-20 pt-32 sm:px-8 lg:pt-40">
+      <div className="text-center">
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gold text-white shadow-lg shadow-gold-soft/40"
+        >
+          {awaitingPayment ? <Clock width={34} height={34} /> : <Check width={36} height={36} strokeWidth={2.5} />}
+        </motion.div>
 
-      <h1 className="type-display-lg mt-7 text-charcoal">Thank you!</h1>
-      <p className="mx-auto mt-4 max-w-md leading-relaxed text-mist">
-        Your order <span className="font-medium text-charcoal">{order}</span> has been placed
-        successfully. A confirmation email and SMS are on their way.
-      </p>
+        <h1 className="type-display-lg mt-7 text-charcoal">
+          {awaitingPayment ? "Order received" : "Thank you!"}
+        </h1>
+        <p className="mx-auto mt-4 max-w-md leading-relaxed text-mist">
+          {awaitingPayment ? (
+            <>
+              Your order <span className="font-medium text-charcoal">{order.id}</span> is saved, but payment is
+              still pending. You can complete it from your orders.
+            </>
+          ) : (
+            <>
+              Your order <span className="font-medium text-charcoal">{order.id}</span> has been placed
+              {order.paymentMethod === "cod"
+                ? ` with ${paymentMethodLabel(order.paymentMethod)}.`
+                : " and your payment is confirmed."}
+            </>
+          )}
+        </p>
+      </div>
 
-      <div className="mx-auto mt-8 max-w-md rounded-2xl border border-clay/60 bg-white/60 p-6 text-left">
-        <div className="flex items-center justify-between">
+      <div className="mt-8 rounded-2xl border border-clay/60 bg-white/60 p-6 sm:p-7">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-sm text-mist">Order number</p>
-            <p className="type-heading-md mt-0.5 text-charcoal">{order}</p>
+            <p className="type-heading-md mt-0.5 text-charcoal">{order.id}</p>
           </div>
           <PackageCheck width={32} height={32} className="text-gold-deep" />
         </div>
-
-        <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-clay/60 pt-5 text-center">
-          <div>
-            <dt className="text-[0.65rem] uppercase tracking-[0.14em] text-taupe">Estimated</dt>
-            <dd className="mt-1 text-sm font-medium text-charcoal">2–4 days</dd>
-          </div>
-          <div>
-            <dt className="text-[0.65rem] uppercase tracking-[0.14em] text-taupe">Payment</dt>
-            <dd className="mt-1 text-sm font-medium text-charcoal">Paid</dd>
-          </div>
-          <div>
-            <dt className="text-[0.65rem] uppercase tracking-[0.14em] text-taupe">Status</dt>
-            <dd className="mt-1 text-sm font-medium text-gold-deep">Confirmed</dd>
-          </div>
-        </dl>
-
-        {/* Track toggle */}
-        <div className="mt-5 rounded-xl bg-cream/70">
-          <button
-            onClick={() => setTrackOpen((o) => !o)}
-            className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-charcoal"
-            aria-expanded={trackOpen}
-          >
-            Track this order
-            <ChevronDown className={trackOpen ? "rotate-180" : ""} width={16} height={16} />
-          </button>
-          <AnimatePresence>
-            {trackOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <ol className="space-y-4 px-4 pb-5 pt-1 text-left">
-                  {[
-                    { label: "Order Placed", done: true },
-                    { label: "Tailoring in Progress", done: false },
-                    { label: "Quality Check", done: false },
-                    { label: "Out for Delivery", done: false },
-                    { label: "Delivered", done: false },
-                  ].map((s, i) => (
-                    <li key={s.label} className="flex items-start gap-3">
-                      <span
-                        className={
-                          "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border " +
-                          (s.done ? "border-gold bg-gold text-white" : "border-taupe/50")
-                        }
-                      >
-                        {s.done && <Check width={10} height={10} strokeWidth={3} />}
-                      </span>
-                      <span className={"text-sm " + (s.done ? "font-medium text-charcoal" : "text-taupe")}>
-                        {s.label}
-                        {i === 0 && <span className="ml-2 text-xs text-gold-deep">Just now</span>}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      <div className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-mist">
-        <span className="flex items-center gap-1.5">
-          <Mail width={14} height={14} />
-          Confirmation sent to your email
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Phone width={14} height={14} />
-          +91 98400 00000 support
-        </span>
+        <OrderDetails order={order} />
       </div>
 
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-        <LinkButton href="/orders">
-          Track Order
+        <LinkButton href={`/orders?order=${encodeURIComponent(order.id)}`}>
+          {awaitingPayment ? "Complete Payment" : "Track Order"}
           <PackageCheck width={15} height={15} />
         </LinkButton>
         <LinkButton href="/sarees" variant="outline">
           Continue Shopping
         </LinkButton>
-        <Button variant="ghost" onClick={copy}>
-          <MessageSquareText width={15} height={15} />
-          {email}
-        </Button>
       </div>
 
-      <p className="mt-10 text-xs text-taupe">
-        Need help? Write to us at {email} — we reply within 24 hours.
+      <p className="mt-10 text-center text-xs text-taupe">
+        <span className="inline-flex items-center gap-1.5">
+          <Mail width={13} height={13} />
+          Need help? Write to{" "}
+          <a href={`mailto:${siteConfig.ordersEmail}`} className="underline underline-offset-4 hover:text-charcoal">
+            {siteConfig.ordersEmail}
+          </a>
+        </span>
         <br />
         <Link href="/shipping" className="underline underline-offset-4 hover:text-charcoal">
           Shipping &amp; delivery details

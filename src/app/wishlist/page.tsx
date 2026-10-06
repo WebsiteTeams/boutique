@@ -2,43 +2,55 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { getProductById } from "@/lib/data";
+import { useEffect, useState } from "react";
+import type { Product } from "@/types";
+import { api } from "@/lib/api";
+import { toCartItem } from "@/lib/cart";
 import { useCart, useToast, useWishlist } from "@/context/store";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { formatINR } from "@/lib/utils";
 
 export default function WishlistPage() {
-  const { wishlist, toggle, clear } = useWishlist();
+  const { wishlist, hydrated, toggle, clear } = useWishlist();
   const { addItem } = useCart();
   const { showToast } = useToast();
-  const [adding, setAdding] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<Product[]>([]);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
 
-  const products = wishlist
-    .map((id) => getProductById(id))
-    .filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const key = wishlist.join(",");
+  const known = new Set(catalog.map((p) => p.id));
+  const needsFetch = wishlist.some((id) => !known.has(id)) && loadedKey !== key;
 
-  const addToBag = (id: string) => {
-    const p = getProductById(id);
-    if (!p) return;
-    setAdding(id);
-    setTimeout(() => {
-      addItem({
-        key: `${p.id}-${p.sizes?.[0] ?? "Free Size"}`,
-        productId: p.id,
-        name: p.name,
-        image: p.images[0],
-        price: p.price,
-        mrp: p.mrp,
-        size: p.sizes?.[0] ?? "Free Size",
-        color: p.color,
-        quantity: 1,
-        customizable: p.customizable,
+  useEffect(() => {
+    if (!hydrated || !needsFetch) return;
+    let cancelled = false;
+    api<{ products: Product[] }>(`/api/products?ids=${encodeURIComponent(key)}`)
+      .then((res) => {
+        if (cancelled) return;
+        setCatalog(res.products);
+        setLoadedKey(key);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
       });
-      showToast("Added to cart", p.name);
-      setAdding(null);
-    }, 350);
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, needsFetch, key]);
+
+  // Keep wishlist order; removals update instantly without a refetch.
+  const products = wishlist
+    .map((id) => catalog.find((p) => p.id === id))
+    .filter((p): p is Product => Boolean(p));
+  const loading = !hydrated || (needsFetch && !failed);
+
+  const addToBag = (p: Product) => {
+    if (!p.inStock) return;
+    addItem(toCartItem(p));
+    showToast("Added to bag", p.name);
   };
 
   return (
@@ -66,7 +78,26 @@ export default function WishlistPage() {
         )}
       </div>
 
-      {products.length === 0 ? (
+      {failed ? (
+        <div className="rounded-2xl border border-clay/60 bg-white/60">
+          <EmptyState
+            icon={<Heart width={26} height={26} />}
+            title="We couldn't load your wishlist"
+            description="Please check your connection and try again."
+            actionLabel="Retry"
+            onAction={() => {
+              setFailed(false);
+              setLoadedKey(null);
+            }}
+          />
+        </div>
+      ) : loading ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="aspect-[3/5] animate-pulse rounded-2xl bg-cream/70" />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
         <div className="rounded-2xl border border-clay/60 bg-white/60">
           <EmptyState
             icon={<Heart width={26} height={26} />}
@@ -122,10 +153,10 @@ export default function WishlistPage() {
                     size="sm"
                     fullWidth
                     className="mt-3"
-                    onClick={() => addToBag(p.id)}
-                    disabled={adding === p.id}
+                    onClick={() => addToBag(p)}
+                    disabled={!p.inStock}
                   >
-                    {adding === p.id ? "Adding…" : "Add to Bag"}
+                    {p.inStock ? "Add to Bag" : "Out of Stock"}
                   </Button>
                 </div>
               </motion.li>

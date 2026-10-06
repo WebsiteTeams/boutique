@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
+import { Suspense } from "react";
 import { CustomBlouseBuilder } from "@/components/custom-blouse/CustomBlouseBuilder";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Custom Blouse",
   description:
     "Design your perfect blouse — choose neckline, sleeves, back, embroidery and finish, then let our master tailors stitch it to your measurements.",
-};
+  path: "/custom-blouse",
+  image: "/images/custom-blouse-feature.png",
+});
 
 export default function CustomBlousePage() {
   return (
@@ -23,7 +26,9 @@ export default function CustomBlousePage() {
         </div>
       </header>
 
-      <CustomBlouseBuilder />
+      <Suspense>
+        <CustomBlouseBuilder />
+      </Suspense>
     </>
   );
 }

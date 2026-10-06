@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { toCartItem } from "@/lib/cart";
 import { useCart, useToast, useWishlist } from "@/context/store";
 import { Badge } from "@/components/ui/Badge";
 import { Price } from "@/components/ui/Price";
@@ -24,23 +25,9 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
   const [quickView, setQuickView] = useState(false);
   const wished = has(product.id);
 
-  const defaultSize = product.sizes?.[0] ?? "Free Size";
-
   const quickAdd = () => {
     if (!product.inStock) return;
-    addItem({
-      key: `${product.id}-${defaultSize}`,
-      productId: product.id,
-      name: product.name,
-      image: product.images[0],
-      price: product.price,
-      mrp: product.mrp,
-      size: defaultSize,
-      color: product.color,
-      fabric: product.fabric,
-      quantity: 1,
-      customizable: product.customizable,
-    });
+    addItem(toCartItem(product));
     showToast("Added to cart", product.name);
   };
 
@@ -95,8 +82,9 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
                 wished ? "info" : "success"
               );
             }}
-            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/90 shadow-soft backdrop-blur transition-all duration-300 hover:scale-105 lg:translate-y-1 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
+            aria-label={wished ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
+            aria-pressed={wished}
+            className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-ivory/90 shadow-soft backdrop-blur transition-all duration-300 hover:scale-105 lg:translate-y-1 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
           >
             <Heart
               width={17}
@@ -112,7 +100,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           {/* Quick view (desktop) */}
           <button
             onClick={() => setQuickView(true)}
-            className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className="absolute inset-0 hidden items-center justify-center opacity-0 transition-opacity duration-300 focus-visible:opacity-100 group-hover:opacity-100 lg:flex"
             aria-label={`Quick view ${product.name}`}
           >
             <span className="type-label-sm flex items-center gap-2 rounded-full bg-ivory/90 px-4 py-2 text-charcoal shadow-lifted backdrop-blur">
@@ -125,7 +113,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           {product.inStock && (
             <button
               onClick={quickAdd}
-              className="type-btn absolute inset-x-3 bottom-3 hidden translate-y-2 items-center justify-center rounded-full bg-charcoal py-2.5 text-ivory opacity-0 shadow-lifted transition-all duration-300 hover:bg-ink lg:flex group-hover:translate-y-0 group-hover:opacity-100"
+              className="type-btn absolute inset-x-3 bottom-3 z-10 hidden translate-y-2 items-center justify-center rounded-full bg-charcoal py-2.5 text-ivory opacity-0 shadow-lifted transition-all duration-300 hover:bg-ink lg:flex group-hover:translate-y-0 group-hover:opacity-100"
             >
               Add to Cart
             </button>
@@ -135,7 +123,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
           {product.inStock && (
             <button
               onClick={quickAdd}
-              className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-charcoal text-ivory shadow-lifted lg:hidden"
+              className="absolute bottom-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-charcoal text-ivory shadow-lifted lg:hidden"
               aria-label={`Add ${product.name} to cart`}
             >
               <Plus width={18} height={18} />

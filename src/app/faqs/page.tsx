@@ -64,7 +64,7 @@ export default function FaqsPage() {
         <a href="mailto:hello@umadesigners.in" className="font-medium text-charcoal underline underline-offset-4">
           hello@umadesigners.in
         </a>{" "}
-        or WhatsApp +91 98765 43210.
+        or message us from the contact page.
       </p>
     </InfoPage>
   );

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { P } from "@/lib/images";
 import { cn } from "@/lib/utils";
@@ -57,7 +58,7 @@ export function Hero() {
           priority
           sizes="100vw"
           alt="Woman wearing a handwoven white and gold silk saree"
-          className="object-cover object-[62%_10%] lg:object-[90%_30%]"
+          className="object-cover object-[90%_center] md:object-[72%_28%] lg:object-[20%_35%]"
         />
       </motion.div>
 
@@ -67,7 +68,7 @@ export function Hero() {
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-5 pb-24 sm:px-8 sm:pb-28 lg:px-10 lg:pb-32">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-5 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-32 lg:px-10 lg:pb-32">
         <motion.div
           variants={container}
           initial="hidden"
@@ -76,13 +77,13 @@ export function Hero() {
         >
           <motion.p
             variants={fadeUp}
-            className="eyebrow mb-6 flex items-center gap-3 text-gold-soft"
+            className="eyebrow mb-5 flex items-center gap-3 text-gold-soft sm:mb-6"
           >
             <span className="h-px w-10 bg-gold-soft/70" />
             The New Collection
           </motion.p>
 
-          <h1 className="type-display-xl text-ivory">
+          <h1 className="serif-display text-[2.6rem] leading-[1.02] text-ivory sm:text-[3.4rem] md:text-[4.25rem] lg:text-[5rem] xl:text-[5.75rem]">
             <RevealLine>Draped in</RevealLine>
             <RevealLine>
               <em className="italic text-gold-soft">Elegance.</em>
@@ -91,29 +92,29 @@ export function Hero() {
 
           <motion.p
             variants={fadeUp}
-            className="serif-display mt-6 text-[1.5rem] italic text-ivory/90 sm:text-[1.75rem]"
+            className="serif-display mt-5 text-[1.2rem] italic text-ivory/90 sm:mt-6 sm:text-[1.5rem] md:text-[1.75rem]"
           >
             Made for Every Moment.
           </motion.p>
 
           <motion.p
             variants={fadeUp}
-            className="mt-5 max-w-md type-body text-ivory/75"
+            className="mt-4 max-w-md type-body text-ivory/75 sm:mt-5"
           >
             Discover timeless sarees and handcrafted pieces designed for the
             modern Indian woman.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-4">
-            <a
+          <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center sm:gap-4">
+            <Link
               href="/sarees"
-              className="type-btn inline-flex h-14 items-center gap-3 rounded-full bg-ivory px-9 text-charcoal transition-all duration-300 hover:bg-white hover:shadow-lifted active:scale-[0.98]"
+              className="type-btn inline-flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ivory px-7 text-charcoal transition-all duration-300 hover:bg-white hover:shadow-lifted active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
             >
               Shop Sarees
-            </a>
-            <a
+            </Link>
+            <Link
               href="/collections"
-              className="type-btn group inline-flex h-14 items-center gap-2 rounded-full border border-ivory/40 px-9 text-ivory transition-all duration-300 hover:border-ivory hover:bg-ivory/10 active:scale-[0.98]"
+              className="type-btn group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ivory/40 px-7 text-ivory transition-all duration-300 hover:border-ivory hover:bg-ivory/10 active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
             >
               Explore Collection
               <ArrowRight
@@ -121,7 +122,7 @@ export function Hero() {
                 height={15}
                 className="transition-transform duration-300 group-hover:translate-x-1"
               />
-            </a>
+            </Link>
           </motion.div>
         </motion.div>
       </div>

@@ -4,10 +4,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Heart, Search, ShoppingBag, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
 import { useCart, useWishlist } from "@/context/store";
+import { siteConfig } from "@/lib/config";
+import { useDialog } from "@/lib/use-dialog";
 
 const LINKS = [
   { label: "Sarees", href: "/sarees" },
@@ -16,6 +18,7 @@ const LINKS = [
   { label: "Collections", href: "/collections" },
   { label: "Lookbook", href: "/lookbook" },
   { label: "New Arrivals", href: "/new-arrivals" },
+  { label: "Book an Appointment", href: "/appointments" },
   { label: "About", href: "/about" },
 ];
 
@@ -31,18 +34,8 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const { count } = useCart();
   const { wishlist } = useWishlist();
 
-  useEffect(() => {
-    if (!open) return;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialog(open, panelRef, onClose);
 
   return (
     <AnimatePresence>
@@ -61,7 +54,10 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             animate={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={{ duration: 0.5, ease }}
-            className="absolute inset-0 flex flex-col bg-ivory"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            className="absolute inset-0 flex flex-col overflow-y-auto bg-ivory"
             aria-label="Mobile menu"
           >
             <div className="flex items-center justify-between border-b border-clay/60 px-6 py-5">
@@ -119,7 +115,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                 <MenuShortcut href="/contact" label="Help" icon={<Search width={19} height={19} />} />
               </div>
               <p className="mt-6 text-center text-xs text-mist">
-                Styling team available 10 AM – 8 PM, all days · +91 98765 43210
+                Styling team available 10 AM – 8 PM, all days{siteConfig.phone ? ` · ${siteConfig.phone}` : ""}
               </p>
             </motion.div>
           </motion.div>

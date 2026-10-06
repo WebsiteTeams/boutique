@@ -4,142 +4,248 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
+  BookmarkPlus,
   Check,
   ImagePlus,
   Loader2,
   UploadCloud,
   X,
 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
-import type { CustomizationSummary } from "@/types";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import type { MeasurementProfile, SavedDesign } from "@/types";
+import { api, errorMessage, uploadImage } from "@/lib/api";
+import {
+  blouseOptionName,
+  blouseUpgrades,
+  buildCustomization,
+  calculateBlousePrice,
+  CUSTOM_BLOUSE_DELIVERY,
+  DEFAULT_BLOUSE_OPTIONS,
+  EMPTY_MEASUREMENTS,
+  isValidBlouseSelection,
+  MEASUREMENT_FIELDS,
+  validateMeasurements,
+} from "@/lib/blouse";
 import { baseBlousePrice, customizationGroups } from "@/lib/data";
-import { useCart, useToast } from "@/context/store";
+import { createPersistentStore, usePersistentStore } from "@/lib/persistent-store";
+import { useAuth, useCart, useToast } from "@/context/store";
 import { cn, formatINR } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { CustomBlouseStepper } from "@/components/custom-blouse/CustomBlouseStepper";
 import { Field, TextArea, TextInput } from "@/components/ui/fields";
 import { SizeGuide } from "@/components/product/SizeGuide";
 
-const MEASUREMENT_FIELDS = [
-  { id: "bust", label: "Bust", hint: "Around the fullest part", required: true },
-  { id: "waist", label: "Waist", hint: "Narrowest point", required: true },
-  { id: "shoulder", label: "Shoulder", hint: "Across the shoulder blades", required: true },
-  { id: "armhole", label: "Armhole", hint: "Around upper arm at shoulder", required: false },
-  { id: "sleeveLength", label: "Sleeve Length", hint: "Shoulder to desired length", required: false },
-  { id: "blouseLength", label: "Blouse Length", hint: "Shoulder to blouse hem", required: false },
-];
-
 const ease = [0.22, 1, 0.36, 1] as const;
 
+interface BlouseDraft {
+  step: number;
+  selected: Record<string, string>;
+  measurements: Record<string, string>;
+  measurementProfile: string | null;
+  image: string | null;
+  instructions: string;
+}
+
+const EMPTY_DRAFT: BlouseDraft = {
+  step: 1,
+  selected: DEFAULT_BLOUSE_OPTIONS,
+  measurements: EMPTY_MEASUREMENTS,
+  measurementProfile: null,
+  image: null,
+  instructions: "",
+};
+
+const stringRecord = (raw: unknown, fallback: Record<string, string>) => {
+  if (typeof raw !== "object" || raw === null) return fallback;
+  const out: Record<string, string> = { ...fallback };
+  for (const [k, v] of Object.entries(raw)) if (k in fallback && typeof v === "string") out[k] = v.slice(0, 40);
+  return out;
+};
+
+/** The in-progress design survives refreshes and navigation until it is added to the bag. */
+const draftStore = createPersistentStore<BlouseDraft>("uma:blouse-draft:v1", EMPTY_DRAFT, (raw) => {
+  if (typeof raw !== "object" || raw === null) return EMPTY_DRAFT;
+  const r = raw as Record<string, unknown>;
+  const selected = stringRecord(r.selected, DEFAULT_BLOUSE_OPTIONS);
+  return {
+    step: typeof r.step === "number" && r.step >= 1 && r.step <= 4 ? Math.floor(r.step) : 1,
+    selected: isValidBlouseSelection(selected) ? selected : DEFAULT_BLOUSE_OPTIONS,
+    measurements: stringRecord(r.measurements, EMPTY_MEASUREMENTS),
+    measurementProfile: typeof r.measurementProfile === "string" ? r.measurementProfile : null,
+    image: typeof r.image === "string" && !r.image.startsWith("data:") ? r.image : null,
+    instructions: typeof r.instructions === "string" ? r.instructions.slice(0, 1000) : "",
+  };
+});
+
+const update = (patch: Partial<BlouseDraft>) => draftStore.set((prev) => ({ ...prev, ...patch }));
+
 export function CustomBlouseBuilder() {
-  const { addCustomBlouse } = useCart();
+  const { addCustomBlouse, openCart } = useCart();
+  const { user } = useAuth();
   const { showToast } = useToast();
-  const [step, setStep] = useState(1);
-  const [selected, setSelected] = useState<Record<string, string>>({
-    neck: "sweetheart",
-    sleeve: "elbow",
-    back: "u-back",
-    embroidery: "none-emb",
-    border: "none-bor",
-    stitching: "hook",
-  });
-  const [measurements, setMeasurements] = useState<Record<string, string>>({
-    bust: "",
-    waist: "",
-    shoulder: "",
-    armhole: "",
-    sleeveLength: "",
-    blouseLength: "",
-  });
+  const designId = useSearchParams().get("design");
+  const draft = usePersistentStore(draftStore);
+  const { step, selected, measurements, image, instructions } = draft;
+
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [image, setImage] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
-  const [instructions, setInstructions] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [profiles, setProfiles] = useState<MeasurementProfile[]>([]);
+  const [saveProfile, setSaveProfile] = useState(false);
+  const [profileName, setProfileName] = useState("My measurements");
+  const [designName, setDesignName] = useState("");
+  const [savingDesign, setSavingDesign] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const customizationPrice = useMemo(() => {
-    let total = baseBlousePrice;
-    for (const group of customizationGroups) {
-      const opt = group.options.find((o) => o.id === selected[group.id]);
-      if (opt) total += opt.price;
-    }
-    return total;
-  }, [selected]);
-
+  const setStep = (next: number) => update({ step: next });
+  const setImage = (next: string | null) => update({ image: next });
+  const setInstructions = (next: string) => update({ instructions: next });
+  const setMeasurement = (id: string, value: string) =>
+    // Editing by hand detaches the values from any loaded saved profile.
+    update({ measurements: { ...draftStore.get().measurements, [id]: value }, measurementProfile: null });
   const setOption = (groupId: string, optionId: string) =>
-    setSelected((prev) => ({ ...prev, [groupId]: optionId }));
+    update({ selected: { ...draftStore.get().selected, [groupId]: optionId } });
 
-  const handleFile = (file?: File | null) => {
+  const customizationPrice = calculateBlousePrice(selected);
+
+  // Saved measurement profiles for signed-in customers.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    api<{ measurements: MeasurementProfile[] }>("/api/account/measurements")
+      .then((res) => {
+        if (!cancelled) setProfiles(res.measurements);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  // Opening /custom-blouse?design=… loads a design saved in the account.
+  useEffect(() => {
+    if (!user || !designId) return;
+    let cancelled = false;
+    api<{ designs: SavedDesign[] }>("/api/account/designs")
+      .then((res) => {
+        const design = res.designs.find((d) => d.id === designId);
+        if (!cancelled && design && isValidBlouseSelection(design.options)) {
+          update({ selected: design.options, step: 1 });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user, designId]);
+
+  const loadProfile = (id: string) => {
+    const profile = profiles.find((p) => p.id === id);
+    if (!profile) {
+      update({ measurementProfile: null });
+      return;
+    }
+    setErrors({});
+    update({
+      measurementProfile: profile.name,
+      measurements: {
+        bust: profile.bust,
+        waist: profile.waist,
+        shoulder: profile.shoulder,
+        armhole: profile.armhole,
+        sleeveLength: profile.sleeveLength,
+        blouseLength: profile.blouseLength,
+      },
+    });
+  };
+
+  const handleFile = async (file?: File | null) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      showToast("Please upload an image file", undefined, "error");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      showToast("Please upload a JPG, PNG or WebP image", undefined, "error");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       showToast("Image too large", "Please upload an image under 5 MB", "error");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setImage(reader.result as string);
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      setImage(await uploadImage(file, "references"));
+    } catch (error) {
+      showToast("Upload failed", errorMessage(error), "error");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
-  const validateMeasurements = () => {
-    const next: Record<string, string> = {};
-    for (const f of MEASUREMENT_FIELDS) {
-      const val = measurements[f.id];
-      if (f.required && !val) {
-        next[f.id] = "Required";
-      } else if (val && (isNaN(Number(val)) || Number(val) <= 0)) {
-        next[f.id] = "Enter a valid number";
-      }
-    }
+  const checkMeasurements = () => {
+    const next = validateMeasurements(measurements);
     setErrors(next);
     return Object.keys(next).length === 0;
   };
 
   const goNext = () => {
-    if (step === 1) {
+    if (step === 2 && !checkMeasurements()) return;
+    if (step < 4) setStep(step + 1);
+  };
+
+  const saveDesign = async () => {
+    if (!designName.trim()) return;
+    setSavingDesign(true);
+    try {
+      await api("/api/account/designs", { body: { name: designName, options: selected } });
+      showToast("Design saved", "Find it under Saved Designs in your account.");
+      setDesignName("");
+    } catch (error) {
+      showToast("Couldn't save design", errorMessage(error), "error");
+    } finally {
+      setSavingDesign(false);
+    }
+  };
+
+  const submit = async () => {
+    if (!checkMeasurements()) {
       setStep(2);
+      showToast("Please complete your measurements", undefined, "error");
       return;
     }
-    if (step === 2) {
-      if (validateMeasurements()) setStep(3);
-      return;
-    }
-    if (step === 3) {
-      setStep(4);
-      return;
-    }
-    submit();
-  };
-
-  const submit = () => {
     setSubmitting(true);
-    const summary: CustomizationSummary = {
-      neck: selected.neck,
-      sleeve: selected.sleeve,
-      back: selected.back,
-      embroidery: selected.embroidery,
-      border: selected.border,
-      stitching: selected.stitching,
-      instructions,
-      referenceImage: image ?? undefined,
-      basePrice: customizationPrice,
-    };
-    setTimeout(() => {
-      addCustomBlouse(summary);
-      showToast("Added to cart", "Your bespoke blouse is in your cart.");
-      setSubmitting(false);
-    }, 600);
+    let profileUsed = draft.measurementProfile ?? undefined;
+    if (user && saveProfile && profileName.trim()) {
+      try {
+        const res = await api<{ measurements: MeasurementProfile[] }>("/api/account/measurements", {
+          body: { name: profileName, ...measurements },
+        });
+        setProfiles(res.measurements);
+        profileUsed = profileName.trim();
+      } catch (error) {
+        // The blouse can still be ordered; only the profile save failed.
+        showToast("Measurements not saved to your account", errorMessage(error), "error");
+      }
+    }
+    addCustomBlouse(
+      buildCustomization({
+        options: selected,
+        measurements,
+        measurementProfile: profileUsed,
+        instructions,
+        referenceImage: image ?? undefined,
+      })
+    );
+    draftStore.set(EMPTY_DRAFT);
+    setSaveProfile(false);
+    setSubmitting(false);
+    showToast("Added to bag", "Your bespoke blouse is in your bag.");
+    openCart();
   };
 
-  const selectedName = (groupId: string) => {
-    const group = customizationGroups.find((g) => g.id === groupId);
-    return group?.options.find((o) => o.id === selected[groupId])?.name ?? "—";
-  };
+  const selectedName = (groupId: string) => blouseOptionName(groupId, selected[groupId]);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
@@ -266,6 +372,35 @@ export function CustomBlouseBuilder() {
                 />
               </div>
 
+              {user ? (
+                profiles.length > 0 && (
+                  <label className="mb-6 block max-w-sm">
+                    <span className="mb-1.5 block text-[0.68rem] font-medium uppercase tracking-[0.18em] text-charcoal/70">
+                      Load saved measurements
+                    </span>
+                    <select
+                      value={profiles.find((p) => p.name === draft.measurementProfile)?.id ?? ""}
+                      onChange={(e) => loadProfile(e.target.value)}
+                      className="w-full rounded-lg border border-clay bg-white/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold-soft/40"
+                    >
+                      <option value="">Enter measurements manually</option>
+                      {profiles.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )
+              ) : (
+                <p className="mb-6 rounded-xl bg-cream px-4 py-3 text-sm text-mist">
+                  <Link href="/login?next=/custom-blouse" className="font-medium text-gold-deep underline underline-offset-4">
+                    Sign in
+                  </Link>{" "}
+                  to load or save your measurements for future orders.
+                </p>
+              )}
+
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {MEASUREMENT_FIELDS.map((f) => (
                   <Field
@@ -280,13 +415,34 @@ export function CustomBlouseBuilder() {
                       placeholder="e.g. 36"
                       error={!!errors[f.id]}
                       value={measurements[f.id]}
-                      onChange={(e) =>
-                        setMeasurements((prev) => ({ ...prev, [f.id]: e.target.value }))
-                      }
+                      onChange={(e) => setMeasurement(f.id, e.target.value)}
                     />
                   </Field>
                 ))}
               </div>
+
+              {user && !draft.measurementProfile && (
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <label className="flex items-center gap-2.5 text-sm text-mist">
+                    <input
+                      type="checkbox"
+                      checked={saveProfile}
+                      onChange={(e) => setSaveProfile(e.target.checked)}
+                      className="h-4 w-4 accent-[#1c1a17]"
+                    />
+                    Save these measurements to my account
+                  </label>
+                  {saveProfile && (
+                    <TextInput
+                      value={profileName}
+                      maxLength={40}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      aria-label="Measurement profile name"
+                      className="max-w-56"
+                    />
+                  )}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -314,7 +470,7 @@ export function CustomBlouseBuilder() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 className="hidden"
                 onChange={(e) => handleFile(e.target.files?.[0])}
               />
@@ -322,6 +478,7 @@ export function CustomBlouseBuilder() {
               {!image ? (
                 <button
                   type="button"
+                  disabled={uploading}
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -341,13 +498,13 @@ export function CustomBlouseBuilder() {
                   )}
                 >
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream text-gold-deep">
-                    <UploadCloud width={24} height={24} />
+                    {uploading ? <Loader2 width={24} height={24} className="animate-spin" /> : <UploadCloud width={24} height={24} />}
                   </span>
                   <span className="type-heading-md text-charcoal">
-                    Drag & drop your reference
+                    {uploading ? "Uploading…" : "Drag & drop your reference"}
                   </span>
                   <span className="text-sm text-mist">
-                    or click to browse — JPG or PNG, up to 5 MB
+                    or click to browse — JPG, PNG or WebP, up to 5 MB
                   </span>
                 </button>
               ) : (
@@ -473,17 +630,12 @@ export function CustomBlouseBuilder() {
                         {formatINR(baseBlousePrice)}
                       </span>
                     </div>
-                    {(() => {
-                      const upgrades = customizationGroups
-                        .flatMap((g) => g.options)
-                        .filter((o) => Object.values(selected).includes(o.id) && o.price > 0);
-                      return upgrades.map((o) => (
-                        <div key={o.id} className="mt-2 flex items-baseline justify-between">
-                          <span className="text-sm text-mist">Upgrade · {o.name}</span>
-                          <span className="text-sm font-medium text-charcoal">+{formatINR(o.price)}</span>
-                        </div>
-                      ));
-                    })()}
+                    {blouseUpgrades(selected).map((o) => (
+                      <div key={o.id} className="mt-2 flex items-baseline justify-between">
+                        <span className="text-sm text-mist">Upgrade · {o.name}</span>
+                        <span className="text-sm font-medium text-charcoal">+{formatINR(o.price)}</span>
+                      </div>
+                    ))}
                     <div className="mt-4 flex items-baseline justify-between border-t border-gold/30 pt-4">
                       <span className="text-sm font-medium text-charcoal">Customization price</span>
                       <span className="type-price-lg text-charcoal">
@@ -491,10 +643,36 @@ export function CustomBlouseBuilder() {
                       </span>
                     </div>
                     <p className="mt-3 text-xs leading-relaxed text-mist">
-                      Stitched to your exact measurements and delivered in ~12 days. Final
-                      cost confirmed by our team before we begin.
+                      Stitched to your exact measurements. {CUSTOM_BLOUSE_DELIVERY}. Our team
+                      reviews every design before tailoring begins.
                     </p>
                   </div>
+
+                  {user && (
+                    <div className="rounded-xl border border-clay/60 p-5">
+                      <h3 className="eyebrow mb-3 text-gold-deep">Save This Design</h3>
+                      <div className="flex gap-2">
+                        <TextInput
+                          value={designName}
+                          maxLength={60}
+                          onChange={(e) => setDesignName(e.target.value)}
+                          placeholder="e.g. Reception blouse"
+                          aria-label="Design name"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-auto shrink-0"
+                          disabled={savingDesign || !designName.trim()}
+                          onClick={saveDesign}
+                        >
+                          <BookmarkPlus width={14} height={14} />
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -506,7 +684,7 @@ export function CustomBlouseBuilder() {
       <div className="mt-8 flex items-center justify-between gap-3">
         <Button
           variant="ghost"
-          onClick={() => setStep((s) => Math.max(1, s - 1))}
+          onClick={() => setStep(Math.max(1, step - 1))}
           disabled={step === 1}
           className="disabled:opacity-40"
         >
@@ -533,7 +711,7 @@ export function CustomBlouseBuilder() {
             ) : (
               <>
                 <ImagePlus width={16} height={16} />
-                Add Customized Blouse to Cart
+                Add Customized Blouse to Bag
               </>
             )}
           </Button>

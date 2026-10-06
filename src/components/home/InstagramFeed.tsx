@@ -6,6 +6,7 @@ import { LinkButton } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { InstagramIcon } from "@/components/ui/SocialIcons";
 import { P } from "@/lib/images";
+import { siteConfig } from "@/lib/config";
 
 const HANDLES = [
   "@uma.looks",
@@ -17,6 +18,10 @@ const HANDLES = [
 ];
 
 export function InstagramFeed() {
+  const instagram = siteConfig.social.instagram;
+  // Without a configured Instagram profile there is nothing real to link to.
+  if (!instagram) return null;
+
   return (
     <section className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-10 lg:py-32">
       <SectionHeading
@@ -28,7 +33,9 @@ export function InstagramFeed() {
         {P.instagram.map((src, i) => (
           <motion.a
             key={src}
-            href="#"
+            href={instagram}
+            target="_blank"
+            rel="noopener noreferrer"
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-40px" }}
@@ -53,7 +60,7 @@ export function InstagramFeed() {
         ))}
       </div>
       <div className="mt-10 flex justify-center">
-        <LinkButton href="#" variant="outline">
+        <LinkButton href={instagram} target="_blank" rel="noopener noreferrer" variant="outline">
           Follow Us
           <ArrowRight width={16} height={16} />
         </LinkButton>

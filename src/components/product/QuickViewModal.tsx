@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/types";
 import { cn, discountPercent, formatINR } from "@/lib/utils";
+import { toCartItem } from "@/lib/cart";
 import { useCart, useToast, useWishlist } from "@/context/store";
 import { Button } from "@/components/ui/Button";
 import { Rating } from "@/components/ui/Rating";
@@ -88,19 +89,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
       showToast("Please select a size", undefined, "error");
       return;
     }
-    addItem({
-      key: `${product.id}-${size ?? "Free Size"}`,
-      productId: product.id,
-      name: product.name,
-      image: product.images[0],
-      price: product.price,
-      mrp: product.mrp,
-      size: size ?? "Free Size",
-      color: product.color,
-      fabric: product.fabric,
-      quantity: 1,
-      customizable: product.customizable,
-    });
+    addItem(toCartItem(product, { size }));
     showToast("Added to cart", product.name);
     onClose();
   };
@@ -350,7 +339,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 product.inStock ? "text-charcoal/80" : "text-red-600"
               )}
             >
-              {product.inStock ? "In stock — ships in 2–4 days" : "Out of stock"}
+              {product.inStock ? `${product.stockState} · ${product.estimatedDelivery}` : "Out of stock"}
             </p>
           </div>
 

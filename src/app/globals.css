@@ -8,7 +8,7 @@
   --color-cream: #efe8dc;
   --color-sand: #e6dfcf;
   --color-clay: #dcd2c3;
-  --color-taupe: #948a78;
+  --color-taupe: #746b5a;
   --color-charcoal: #1c1a17;
   --color-ink: #14110b;
   --color-gold: #a47a45;
@@ -16,7 +16,7 @@
   --color-gold-deep: #7e5a2a;
   --color-blush: #f0e3dd;
   --color-mist: #756d63;
-  --color-muted: #9a9187;
+  --color-muted: #736a5f;
 
   --shadow-soft: 0 1px 2px rgb(38 34 25 / 0.04), 0 8px 24px rgb(38 34 25 / 0.06);
   --shadow-lifted: 0 2px 4px rgb(38 34 25 / 0.05), 0 20px 48px rgb(38 34 25 / 0.12);
@@ -74,6 +74,19 @@ body {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee-x 30s linear infinite;
 }
 
 @utility text-balance {
@@ -293,5 +306,8 @@ input[type="number"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .animate-marquee {
+    animation: none !important;
   }
 }

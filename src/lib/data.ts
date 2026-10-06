@@ -2,16 +2,16 @@ import type {
   CategoryItem,
   CollectionItem,
   CustomizationGroup,
-  Order,
-  Product,
   Review,
+  SeedProduct,
 } from "@/types";
 import { P } from "@/lib/images";
 
-export const FREE_DELIVERY_THRESHOLD = 2000;
-export const SHIPPING_FEE = 99;
-
-export const products: Product[] = [
+/**
+ * Bundled starter catalog. It is used only by `npm run db:seed` to populate the
+ * database — the storefront reads products from the database, never from here.
+ */
+export const seedProducts: SeedProduct[] = [
   {
     id: "pr-01",
     slug: "banarasi-butterfly-silk-saree",
@@ -27,11 +27,7 @@ export const products: Product[] = [
     occasion: "Wedding",
     pattern: "Floral",
     images: P.products["pr-01"],
-    badge: "bestseller",
-    rating: 4.9,
-    reviewCount: 128,
     isBestSeller: true,
-    inStock: true,
     customizable: true,
     care: ["Dry clean only", "Store in a muslin wrap", "Keep away from direct sunlight"],
     details: [
@@ -58,10 +54,6 @@ export const products: Product[] = [
     occasion: "Bridal",
     pattern: "Temple",
     images: P.products["pr-02"],
-    badge: "sale",
-    rating: 4.8,
-    reviewCount: 94,
-    inStock: true,
     customizable: true,
     care: ["Dry clean only", "Store in a muslin wrap"],
     details: [
@@ -87,11 +79,7 @@ export const products: Product[] = [
     occasion: "Festive",
     pattern: "Dotted",
     images: P.products["pr-03"],
-    badge: "new",
-    rating: 4.7,
-    reviewCount: 61,
     isNew: true,
-    inStock: true,
     care: ["Hand wash in cold water", "Mild detergent", "Dry in shade"],
     details: [
       "Length: 6.3 m with unstitched blouse piece",
@@ -116,9 +104,6 @@ export const products: Product[] = [
     occasion: "Everyday",
     pattern: "Solid",
     images: P.products["pr-04"],
-    rating: 4.6,
-    reviewCount: 210,
-    inStock: true,
     care: ["Machine wash gentle", "Line dry in shade", "Iron on medium"],
     details: [
       "Length: 6.3 m with unstitched blouse piece",
@@ -142,11 +127,7 @@ export const products: Product[] = [
     occasion: "Reception",
     pattern: "Floral",
     images: P.products["pr-05"],
-    badge: "new",
-    rating: 4.8,
-    reviewCount: 47,
     isNew: true,
-    inStock: true,
     customizable: true,
     care: ["Dry clean only", "Store flat in a garment bag"],
     details: [
@@ -171,10 +152,6 @@ export const products: Product[] = [
     occasion: "Party",
     pattern: "Embroidered",
     images: P.products["pr-06"],
-    badge: "sale",
-    rating: 4.7,
-    reviewCount: 83,
-    inStock: true,
     care: ["Dry clean recommended", "Steam iron on low"],
     details: [
       "Length: 6.3 m with unstitched blouse piece",
@@ -198,9 +175,6 @@ export const products: Product[] = [
     occasion: "Festive",
     pattern: "Solid",
     images: P.products["pr-07"],
-    rating: 4.6,
-    reviewCount: 52,
-    inStock: true,
     care: ["Dry clean only", "Air before storing"],
     details: [
       "Length: 6.3 m with unstitched blouse piece",
@@ -224,9 +198,6 @@ export const products: Product[] = [
     occasion: "Festive",
     pattern: "Bandhani",
     images: P.products["pr-08"],
-    rating: 4.5,
-    reviewCount: 39,
-    inStock: true,
     care: ["Gentle hand wash", "Dry in shade"],
     details: [
       "Length: 6.3 m with unstitched blouse piece",
@@ -250,12 +221,8 @@ export const products: Product[] = [
     occasion: "Everyday",
     pattern: "Solid",
     images: P.products["pr-09"],
-    badge: "new",
-    rating: 4.6,
-    reviewCount: 154,
     sizes: ["S", "M", "L", "XL", "XXL"],
     isNew: true,
-    inStock: true,
     care: ["Machine wash gentle", "Do not bleach"],
     details: [
       "Kurti, bottom & dupatta included",
@@ -279,10 +246,7 @@ export const products: Product[] = [
     occasion: "Everyday",
     pattern: "Solid",
     images: P.products["pr-10"],
-    rating: 4.7,
-    reviewCount: 88,
     sizes: ["S", "M", "L", "XL", "XXL"],
-    inStock: true,
     care: ["Gentle machine wash", "Iron while slightly damp"],
     details: [
       "Kurti & palazzo set",
@@ -306,11 +270,7 @@ export const products: Product[] = [
     occasion: "Party",
     pattern: "Embroidered",
     images: P.products["pr-11"],
-    badge: "sale",
-    rating: 4.8,
-    reviewCount: 67,
     sizes: ["S", "M", "L", "XL"],
-    inStock: true,
     care: ["Dry clean only"],
     details: [
       "Floor length anarkali",
@@ -334,10 +294,7 @@ export const products: Product[] = [
     occasion: "Everyday",
     pattern: "Printed",
     images: P.products["pr-12"],
-    rating: 4.5,
-    reviewCount: 173,
     sizes: ["S", "M", "L", "XL", "XXL"],
-    inStock: true,
     care: ["Machine wash cold", "Dry in shade"],
     details: ["Kurti, bottom & dupatta", "Batik print", "Breathable voile"],
     tags: ["chudithar", "cotton", "printed"],
@@ -357,12 +314,8 @@ export const products: Product[] = [
     occasion: "Festive",
     pattern: "Gota",
     images: P.products["pr-13"],
-    badge: "bestseller",
-    rating: 4.8,
-    reviewCount: 59,
     sizes: ["S", "M", "L", "XL"],
     isBestSeller: true,
-    inStock: true,
     care: ["Dry clean recommended"],
     details: ["Gota work accents", "Matching dupatta", "Regular fit"],
     tags: ["chudithar", "silk", "gota"],
@@ -382,10 +335,7 @@ export const products: Product[] = [
     occasion: "Work",
     pattern: "Striped",
     images: P.products["pr-14"],
-    rating: 4.6,
-    reviewCount: 44,
     sizes: ["S", "M", "L", "XL", "XXL"],
-    inStock: true,
     care: ["Machine wash gentle", "Warm iron"],
     details: ["Pinstripe pattern", "Relaxed straight cut", "Matching dupatta"],
     tags: ["chudithar", "linen", "work"],
@@ -405,12 +355,8 @@ export const products: Product[] = [
     occasion: "Festive",
     pattern: "Handblock",
     images: P.products["pr-15"],
-    badge: "new",
-    rating: 4.7,
-    reviewCount: 76,
     sizes: ["S", "M", "L", "XL", "XXL"],
     isNew: true,
-    inStock: true,
     care: ["Hand wash separately", "Dry in shade"],
     details: ["Vegetable-dyed handblock", "Matching dupatta", "Slight unevenness is the craft"],
     tags: ["chudithar", "handblock", "artisan"],
@@ -430,10 +376,6 @@ export const products: Product[] = [
     occasion: "Any",
     pattern: "Custom",
     images: P.products["pr-16"],
-    badge: "bestseller",
-    rating: 4.9,
-    reviewCount: 312,
-    inStock: true,
     customizable: true,
     isBestSeller: true,
     care: ["Dry clean recommended", "Store on padded hanger"],
@@ -445,29 +387,6 @@ export const products: Product[] = [
     tags: ["blouse", "custom", "bespoke"],
   },
 ];
-
-export const getProductBySlug = (slug: string) =>
-  products.find((p) => p.slug === slug);
-
-export const getProductById = (id: string) => products.find((p) => p.id === id);
-
-export const getRelatedProducts = (product: Product, count = 4) => {
-  const scored = products
-    .filter((p) => p.id !== product.id)
-    .map((p) => {
-      let score = 0;
-      if (p.category === product.category) score += 3;
-      if (p.occasion === product.occasion) score += 2;
-      if (p.fabric === product.fabric) score += 2;
-      p.tags.forEach((t) => {
-        if (product.tags.includes(t)) score += 1;
-      });
-      return { p, score };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, count);
-  return scored.map((s) => s.p);
-};
 
 export const categories: CategoryItem[] = [
   {
@@ -570,110 +489,6 @@ export const reviews: Review[] = [
   },
 ];
 
-export const orders: Order[] = [
-  {
-    id: "UMA-240618",
-    placedOn: "2026-07-28",
-    items: [
-      {
-        key: "pr-01-M",
-        productId: "pr-01",
-        name: "Banarasi Butterfly Silk Saree",
-        image: P.products["pr-01"][0],
-        price: 18999,
-        mrp: 25999,
-        size: "Free Size",
-        color: "Ivory & Gold",
-        quantity: 1,
-      },
-    ],
-    total: 18999,
-    status: "Out for Delivery",
-    eta: "Aug 15, 2026",
-    paymentMethod: "UPI",
-    isCustomBlouse: false,
-    timeline: [
-      { label: "Order Placed", date: "Jul 28, 2026", done: true },
-      { label: "Order Confirmed", date: "Jul 28, 2026", done: true },
-      { label: "Processing", date: "Jul 30, 2026", done: true },
-      { label: "Shipped", date: "Aug 5, 2026", done: true },
-      { label: "Out for Delivery", date: "Aug 13, 2026", done: true },
-      { label: "Delivered", date: "—", done: false },
-    ],
-  },
-  {
-    id: "UMA-240512",
-    placedOn: "2026-06-02",
-    items: [
-      {
-        key: "pr-10-M",
-        productId: "pr-10",
-        name: "Sage Linen Palazzo Chudithar",
-        image: "/images/chudithars/chudithar-sage-linen-1.png",
-        price: 3299,
-        mrp: 4499,
-        size: "M",
-        color: "Sage Green",
-        quantity: 1,
-      },
-    ],
-    total: 3299,
-    status: "Delivered",
-    eta: "Delivered Jun 8, 2026",
-    paymentMethod: "Card",
-    isCustomBlouse: false,
-    timeline: [
-      { label: "Order Placed", date: "Jun 2, 2026", done: true },
-      { label: "Order Confirmed", date: "Jun 2, 2026", done: true },
-      { label: "Processing", date: "Jun 3, 2026", done: true },
-      { label: "Shipped", date: "Jun 5, 2026", done: true },
-      { label: "Out for Delivery", date: "Jun 8, 2026", done: true },
-      { label: "Delivered", date: "Jun 8, 2026", done: true },
-    ],
-  },
-  {
-    id: "UMA-240491",
-    placedOn: "2026-05-20",
-    items: [
-      {
-        key: "custom-blouse-1",
-        productId: "pr-16",
-        name: "Customised Silk Blouse",
-        image: "/images/blouses/blouse-bespoke-silk-1.png",
-        price: 4299,
-        mrp: 5299,
-        size: "Custom Fit",
-        color: "U-Back · 3/4 Sleeve",
-        quantity: 1,
-        customizable: true,
-        customization: {
-          neck: "Sweetheart",
-          sleeve: "3/4 Sleeve",
-          back: "U-Back",
-          embroidery: "Thread",
-          border: "Contrast",
-          stitching: "Hidden Zip",
-          instructions: "Elbow-length sleeves with a slightly deeper back neck.",
-          basePrice: 4299,
-        },
-      },
-    ],
-    total: 4299,
-    status: "Stitching",
-    eta: "Estimated delivery Aug 24, 2026",
-    paymentMethod: "Cash on Delivery",
-    isCustomBlouse: true,
-    timeline: [
-      { label: "Customization Received", date: "May 20, 2026", done: true },
-      { label: "Design Confirmed", date: "May 22, 2026", done: true },
-      { label: "Stitching", date: "May 28, 2026", done: true },
-      { label: "Quality Check", date: "In Progress", done: false },
-      { label: "Shipped", date: "—", done: false },
-      { label: "Delivered", date: "—", done: false },
-    ],
-  },
-];
-
 export const customizationGroups: CustomizationGroup[] = [
   {
     id: "neck",
@@ -755,13 +570,3 @@ export const sizeGuideRows = [
   { size: "XL", bust: "38-40", waist: "32-34", hip: "40-42", shoulder: "15.5" },
   { size: "XXL", bust: "40-42", waist: "34-36", hip: "42-44", shoulder: "16" },
 ];
-
-export const filters = {
-  category: ["Silk Sarees", "Handloom Sarees", "Cotton Sarees", "Designer Sarees"],
-  price: ["Under ₹5,000", "₹5,000 – ₹10,000", "₹10,000 – ₹20,000", "Above ₹20,000"],
-  color: ["Ivory", "Gold", "Emerald", "Fuchsia", "Copper", "Rose Gold", "Powder Blue", "Sage Green", "Blush Pink", "Terracotta", "Maroon", "Jade", "Mist Grey"],
-  fabric: ["Silk", "Cotton", "Organza", "Georgette", "Chanderi", "Tussar", "Linen", "Rayon"],
-  occasion: ["Wedding", "Bridal", "Festive", "Everyday", "Reception", "Party", "Work"],
-  pattern: ["Floral", "Temple", "Dotted", "Solid", "Embroidered", "Bandhani", "Printed", "Gota", "Striped", "Handblock"],
-  availability: ["In Stock", "Made to Order"],
-};

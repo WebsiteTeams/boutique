@@ -21,7 +21,7 @@ export function ProductCarousel({ products, className }: ProductCarouselProps) {
     <div className={className}>
       <div
         ref={trackRef}
-        className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-5 px-5 pb-2 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10"
+        className="no-scrollbar mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-3 sm:-mx-8 sm:gap-6 sm:scroll-px-8 sm:px-8 lg:-mx-10 lg:gap-8 lg:scroll-px-10 lg:px-10"
         style={{
           WebkitOverflowScrolling: "touch",
           scrollbarWidth: "none",
@@ -30,7 +30,7 @@ export function ProductCarousel({ products, className }: ProductCarouselProps) {
         {products.map((p, i) => (
           <div
             key={p.id}
-            className="w-[58vw] shrink-0 snap-start xs:w-[48vw] min-[420px]:w-[46vw] sm:w-[38vw] md:w-[32vw] lg:w-[24%] xl:w-[19%]"
+            className="w-[74vw] mx-1 shrink-0 snap-start sm:w-[45vw] md:w-[32vw] lg:w-[23%] xl:w-[19%]"
           >
             <ProductCard product={p} index={i} />
           </div>

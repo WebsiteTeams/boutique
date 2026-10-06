@@ -1,6 +1,6 @@
 import { Package, RefreshCcw, ShieldCheck, Truck } from "lucide-react";
 import { InfoPage } from "@/components/ui/InfoPage";
-import { FREE_DELIVERY_THRESHOLD, SHIPPING_FEE } from "@/lib/data";
+import { FREE_DELIVERY_THRESHOLD, SHIPPING_FEE } from "@/lib/pricing";
 import { formatINR } from "@/lib/utils";
 
 const FEATURES = [

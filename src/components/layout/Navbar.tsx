@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useCart, useWishlist } from "@/context/store";
+import { useAuth, useCart, useWishlist } from "@/context/store";
 import { Logo } from "@/components/ui/Logo";
 import { SearchOverlay } from "@/components/ui/SearchOverlay";
 import { MobileMenu } from "@/components/layout/MobileMenu";
@@ -23,6 +23,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { count, openCart } = useCart();
   const { wishlist } = useWishlist();
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -118,7 +119,7 @@ export function Navbar() {
                 "relative hidden shrink-0 rounded-full p-2.5 transition-colors sm:flex",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
-              aria-label="Wishlist"
+              aria-label={wishlist.length > 0 ? `Wishlist, ${wishlist.length} saved` : "Wishlist"}
             >
               <Heart width={19} height={19} />
               {wishlist.length > 0 && (
@@ -128,12 +129,12 @@ export function Navbar() {
               )}
             </Link>
             <Link
-              href="/account"
+              href={user ? "/account" : "/login"}
               className={cn(
                 "hidden shrink-0 rounded-full p-2.5 transition-colors sm:flex",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
-              aria-label="Account"
+              aria-label={user ? "My account" : "Sign in"}
             >
               <User width={19} height={19} />
             </Link>
@@ -143,7 +144,7 @@ export function Navbar() {
                 "relative shrink-0 rounded-full p-2.5 transition-colors",
                 onDark ? "text-ivory hover:bg-ivory/10" : "text-charcoal hover:bg-sand/50"
               )}
-              aria-label="Open cart"
+              aria-label={count > 0 ? `Open bag, ${count} item${count === 1 ? "" : "s"}` : "Open bag"}
             >
               <ShoppingBag width={19} height={19} />
               {count > 0 && (

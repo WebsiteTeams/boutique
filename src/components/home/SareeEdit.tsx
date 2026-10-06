@@ -1,4 +1,4 @@
-import { products } from "@/lib/data";
+import { listProducts } from "@/server/services/products";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LinkButton } from "@/components/ui/Button";
 import { ProductGrid } from "@/components/product/ProductGrid";
@@ -13,8 +13,8 @@ const SHORTCUTS = [
   { label: "Festive", href: "/sarees?occasion=Festive" },
 ];
 
-export function SareeEdit() {
-  const sarees = products.filter((p) => p.category === "sarees").slice(0, 8);
+export async function SareeEdit() {
+  const sarees = await listProducts({ category: "sarees", limit: 8 });
 
   return (
     <section className="bg-cream/60">

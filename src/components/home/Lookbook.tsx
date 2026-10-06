@@ -34,7 +34,7 @@ export function Lookbook() {
               transition={{ duration: 0.75, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               className={cn("group relative overflow-hidden bg-ink", layout[c.id])}
             >
-              <Link href="/collections" className="relative block h-full">
+              <Link href={`/collections/${c.id}`} className="relative block h-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={c.image}

@@ -2,21 +2,20 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
-import { products as allProducts } from "@/lib/data";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { FilterSidebar, type FilterGroup } from "@/components/product/FilterSidebar";
 import { SizeGuide } from "@/components/product/SizeGuide";
 
 interface ShopProps {
+  /** Catalog for this listing, loaded from the database by the page. */
+  products: Product[];
   title: string;
   description: string;
   image?: string;
-  category?: "sarees" | "chudithars" | "blouses";
-  onlyNew?: boolean;
   showSizeGuide?: boolean;
 }
 
@@ -41,7 +40,11 @@ function buildGroups(list: Product[]): FilterGroup[] {
     { id: "price", label: "Price", options: PRICE_BANDS.map((b) => b.label) },
     { id: "color", label: "Color", options: unique("color") },
     { id: "fabric", label: "Fabric", options: unique("fabric") },
-    { id: "occasion", label: "Occasion", options: unique("occasion") },
+    {
+      id: "occasion",
+      label: "Occasion",
+      options: Array.from(new Set(list.flatMap((p) => p.occasions))),
+    },
     { id: "pattern", label: "Pattern", options: unique("pattern") },
     { id: "availability", label: "Availability", options: ["In Stock", "Made to Order"] },
   ];
@@ -55,7 +58,7 @@ function buildGroups(list: Product[]): FilterGroup[] {
 function matches(product: Product, selected: Record<string, string[]>, search: string): boolean {
   const q = search.trim().toLowerCase();
   if (q) {
-    const hay = `${product.name} ${product.fabric} ${product.color} ${product.occasion} ${product.subcategory} ${product.tags.join(" ")}`.toLowerCase();
+    const hay = `${product.name} ${product.fabric} ${product.color} ${product.occasions.join(" ")} ${product.subcategory} ${product.tags.join(" ")}`.toLowerCase();
     if (!hay.includes(q)) return false;
   }
   for (const [group, values] of Object.entries(selected)) {
@@ -67,9 +70,11 @@ function matches(product: Product, selected: Record<string, string[]>, search: s
       if (!values.includes(product.subcategory)) return false;
     } else if (group === "availability") {
       const ok =
-        (values.includes("In Stock") && product.inStock) ||
-        (values.includes("Made to Order") && product.customizable);
+        (values.includes("In Stock") && product.deliveryType === "ready" && product.inStock) ||
+        (values.includes("Made to Order") && product.deliveryType === "made_to_order");
       if (!ok) return false;
+    } else if (group === "occasion") {
+      if (!values.some((v) => product.occasions.includes(v))) return false;
     } else {
       if (!values.includes(String(product[group as keyof Product]))) return false;
     }
@@ -85,57 +90,112 @@ export function Shop(props: ShopProps) {
   );
 }
 
-function ShopInner({ title, description, category, onlyNew, showSizeGuide, image }: ShopProps) {
+/** URL parameter used for each filter group — the URL is the single source of truth. */
+const PARAM_BY_GROUP: Record<string, string> = {
+  category: "sub",
+  price: "price",
+  color: "color",
+  fabric: "fabric",
+  occasion: "occasion",
+  pattern: "pattern",
+  availability: "availability",
+};
+
+function ShopInner({ products: list, title, description, showSizeGuide, image }: ShopProps) {
   const searchParams = useSearchParams();
-  const list = useMemo(() => {
-    let base = category ? allProducts.filter((p) => p.category === category) : allProducts;
-    if (onlyNew) base = base.filter((p) => p.isNew);
-    return base;
-  }, [category, onlyNew]);
+  const pathname = usePathname();
+  const router = useRouter();
   const groups = useMemo(() => buildGroups(list), [list]);
 
-  const [selected, setSelected] = useState<Record<string, string[]>>(() => {
-    const init: Record<string, string[]> = {};
-    const sub = searchParams.get("sub");
-    if (sub) init.category = [sub];
-    const occasion = searchParams.get("occasion");
-    if (occasion) init.occasion = [occasion];
-    return init;
-  });
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("newest");
+  // Filters, sort and search are derived from the URL on every render, so
+  // navigating between e.g. ?sub=Silk and ?sub=Cotton updates immediately.
+  const paramString = searchParams.toString();
+  const selected = useMemo(() => {
+    const params = new URLSearchParams(paramString);
+    const out: Record<string, string[]> = {};
+    for (const [group, param] of Object.entries(PARAM_BY_GROUP)) {
+      const values = params.getAll(param);
+      if (values.length > 0) out[group] = values;
+    }
+    return out;
+  }, [paramString]);
+  const sort = SORTS.some((s) => s.id === searchParams.get("sort")) ? searchParams.get("sort")! : "newest";
+  const urlSearch = searchParams.get("q") ?? "";
+
+  const [search, setSearch] = useState(urlSearch);
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  if (urlSearch !== syncedSearch) {
+    setSyncedSearch(urlSearch);
+    setSearch(urlSearch);
+  }
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const activeCount = Object.values(selected).reduce((a, v) => a + v.length, 0);
 
+  const updateParams = useCallback(
+    (mutate: (params: URLSearchParams) => void) => {
+      const params = new URLSearchParams(paramString);
+      mutate(params);
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [paramString, pathname, router]
+  );
+
+  // Keep the search box in the URL (debounced) so results are shareable.
+  useEffect(() => {
+    if (search === urlSearch) return;
+    const timer = setTimeout(() => {
+      updateParams((params) => {
+        if (search.trim()) params.set("q", search);
+        else params.delete("q");
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, urlSearch, updateParams]);
+
   useEffect(() => {
     if (!filtersOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFiltersOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
+      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [filtersOpen]);
 
+  // Toggling one value only touches that group's parameter; everything else is preserved.
   const toggle = (groupId: string, value: string) => {
-    setSelected((prev) => {
-      const current = prev[groupId] ?? [];
-      return {
-        ...prev,
-        [groupId]: current.includes(value)
-          ? current.filter((v) => v !== value)
-          : [...current, value],
-      };
+    const param = PARAM_BY_GROUP[groupId];
+    if (!param) return;
+    updateParams((params) => {
+      const current = params.getAll(param);
+      const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+      params.delete(param);
+      next.forEach((v) => params.append(param, v));
     });
   };
 
-  const clear = () => setSelected({});
+  const clear = () =>
+    updateParams((params) => {
+      Object.values(PARAM_BY_GROUP).forEach((param) => params.delete(param));
+    });
+
+  const setSort = (value: string) =>
+    updateParams((params) => {
+      if (value === "newest") params.delete("sort");
+      else params.set("sort", value);
+    });
 
   const results = useMemo(() => {
     let out = list.filter((p) => matches(p, selected, search));
     switch (sort) {
       case "newest":
-        out = [...out].sort((a, b) => Number(b.isNew ?? false) - Number(a.isNew ?? false) || b.id.localeCompare(a.id));
+        // The server already returns newest first.
         break;
       case "popular":
         out = [...out].sort((a, b) => b.reviewCount - a.reviewCount);
@@ -318,6 +378,9 @@ function ShopInner({ title, description, category, onlyNew, showSizeGuide, image
               exit={{ x: "-100%" }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="absolute left-0 top-0 h-full"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Filters"
             >
               <FilterSidebar
                 mobile
