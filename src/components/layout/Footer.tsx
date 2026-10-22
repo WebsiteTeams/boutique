@@ -4,7 +4,6 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { GENERAL_STYLIST_MESSAGE, siteConfig, whatsappLink } from "@/lib/config";
-import { Newsletter } from "@/components/ui/Newsletter";
 import {
   FacebookIcon,
   InstagramIcon,
