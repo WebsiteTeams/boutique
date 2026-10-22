@@ -2,13 +2,14 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 import { api } from "@/lib/api";
 import { toCartItem } from "@/lib/cart";
 import { useCart, useToast, useWishlist } from "@/context/store";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Button, LinkButton } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { formatINR } from "@/lib/utils";
 
 export default function WishlistPage() {
@@ -70,7 +71,8 @@ export default function WishlistPage() {
               clear();
               showToast("Wishlist cleared", undefined, "info");
             }}
-            className="flex items-center gap-1.5 text-xs text-taupe underline underline-offset-4 hover:text-charcoal"
+            type="button"
+            className="flex min-h-10 items-center gap-1.5 px-1 text-xs text-taupe underline underline-offset-4 hover:text-charcoal"
           >
             <Trash2 width={13} height={13} />
             Clear all
@@ -83,6 +85,7 @@ export default function WishlistPage() {
           <EmptyState
             icon={<Heart width={26} height={26} />}
             title="We couldn't load your wishlist"
+            titleAs="h2"
             description="Please check your connection and try again."
             actionLabel="Retry"
             onAction={() => {
@@ -102,9 +105,10 @@ export default function WishlistPage() {
           <EmptyState
             icon={<Heart width={26} height={26} />}
             title="Your wishlist is empty"
+            titleAs="h2"
             description="Tap the heart on any piece to save it here for later."
             actionLabel="Discover the Collection"
-            href="/sarees"
+            href="/shop"
           />
         </div>
       ) : (
@@ -120,14 +124,14 @@ export default function WishlistPage() {
                 className="group overflow-hidden rounded-2xl border border-clay/60 bg-white/60"
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-cream">
-                  <LinkButton href={`/product/${p.slug}`} variant="ghost" className="h-full w-full p-0">
+                  <Link href={`/product/${p.slug}`} className="block h-full w-full" aria-label={p.name}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={p.images[0]}
                       alt={p.name}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-luxe motion-safe:group-hover:scale-105"
                     />
-                  </LinkButton>
+                  </Link>
                   <button
                     onClick={() => {
                       toggle(p.id);

@@ -1,10 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import type { CollectionItem } from "@/types";
-import { cn } from "@/lib/utils";
+import { EditorialCard } from "@/components/ui/EditorialCard";
 
 interface CollectionCardProps {
   collection: CollectionItem;
@@ -21,37 +19,23 @@ export function CollectionCard({
 }: CollectionCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 36 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.75, delay: revealDelay, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("group relative overflow-hidden rounded-2xl", className)}
+      transition={{ duration: 0.5, delay: revealDelay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
     >
-      <Link href="/sarees" className="relative block">
-        <div className={cn("relative overflow-hidden", aspect)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={collection.image}
-            alt={collection.name}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.07]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
-          <p className="eyebrow mb-1.5 text-gold-soft">{collection.tagline}</p>
-          <h3 className="type-heading-lg text-ivory">
-            {collection.name}
-          </h3>
-          <p className="mt-1.5 line-clamp-2 max-w-[26ch] type-meta leading-relaxed text-ivory/70">
-            {collection.description}
-          </p>
-          <span className="mt-4 inline-flex items-center gap-2 type-btn text-ivory/90">
-            Explore
-            <ArrowRight width={15} height={15} className="transition-transform duration-300 group-hover:translate-x-1" />
-          </span>
-        </div>
-      </Link>
+      <EditorialCard
+        href={`/collections/${collection.id}`}
+        image={collection.image}
+        alt=""
+        eyebrow={collection.tagline}
+        title={collection.name}
+        caption={collection.description}
+        cta="Shop this edit"
+        aspect={aspect}
+        className="h-full"
+      />
     </motion.div>
   );
 }

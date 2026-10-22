@@ -40,10 +40,12 @@ const MINUTE = 60_000;
 
 export const RATE_LIMITS = {
   login: { name: "login", limit: 10, windowMs: 15 * MINUTE },
+  adminLogin: { name: "admin-login", limit: 5, windowMs: 15 * MINUTE },
   register: { name: "register", limit: 5, windowMs: 60 * MINUTE },
+  passwordResetRequest: { name: "password-reset-request", limit: 5, windowMs: 60 * MINUTE },
+  passwordResetConfirm: { name: "password-reset-confirm", limit: 10, windowMs: 15 * MINUTE },
   contact: { name: "contact", limit: 5, windowMs: 60 * MINUTE },
   newsletter: { name: "newsletter", limit: 5, windowMs: 60 * MINUTE },
-  appointment: { name: "appointment", limit: 6, windowMs: 60 * MINUTE },
   upload: { name: "upload", limit: 20, windowMs: 60 * MINUTE },
   coupon: { name: "coupon", limit: 30, windowMs: 15 * MINUTE },
   order: { name: "order", limit: 15, windowMs: 15 * MINUTE },

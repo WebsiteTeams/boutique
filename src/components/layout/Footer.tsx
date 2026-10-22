@@ -27,7 +27,6 @@ const LINK_GROUPS = [
     links: [
       { label: "Our Story", href: "/about" },
       { label: "Contact", href: "/contact" },
-      { label: "Book an Appointment", href: "/appointments" },
       { label: "Size Guide", href: "/size-guide" },
       { label: "Shipping", href: "/shipping" },
       { label: "Returns", href: "/returns" },
@@ -54,41 +53,36 @@ const SOCIALS = [
 export function Footer() {
   return (
     <footer className="bg-charcoal text-ivory">
-      {/* Newsletter band */}
-      <div className="border-b border-ivory/10">
-        <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
-          <Newsletter dark />
-        </div>
-      </div>
+    
 
       {/* Link columns */}
-      <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 lg:px-10 lg:py-20">
-        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-6">
-          <div className="lg:col-span-2">
+      <nav aria-label="Footer" className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-10 lg:py-20">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Logo dark />
-            <p className="mt-6 max-w-xs text-sm leading-relaxed text-ivory/60">
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-ivory/70">
               A design-led boutique for sarees, chudithars and made-to-measure
               blouses — woven for the modern Indian woman.
             </p>
-            <div className="mt-7 space-y-3 text-sm text-ivory/60">
-              <p className="flex items-center gap-3">
-                <MapPin width={15} height={15} className="text-gold-soft" />
+            <div className="mt-6 space-y-1 text-sm text-ivory/70">
+              <p className="flex min-h-10 items-center gap-3">
+                <MapPin width={15} height={15} className="shrink-0 text-gold-soft" aria-hidden />
                 {siteConfig.address}
               </p>
               {siteConfig.phone && (
                 <a
                   href={siteConfig.phoneHref}
-                  className="flex items-center gap-3 transition-colors hover:text-ivory"
+                  className="flex min-h-10 w-fit items-center gap-3 transition-colors hover:text-ivory"
                 >
-                  <Phone width={15} height={15} className="text-gold-soft" />
+                  <Phone width={15} height={15} className="shrink-0 text-gold-soft" aria-hidden />
                   {siteConfig.phone}
                 </a>
               )}
               <a
                 href={`mailto:${siteConfig.email}`}
-                className="flex items-center gap-3 transition-colors hover:text-ivory"
+                className="flex min-h-10 w-fit items-center gap-3 break-all transition-colors hover:text-ivory"
               >
-                <Mail width={15} height={15} className="text-gold-soft" />
+                <Mail width={15} height={15} className="shrink-0 text-gold-soft" aria-hidden />
                 {siteConfig.email}
               </a>
             </div>
@@ -96,13 +90,13 @@ export function Footer() {
 
           {LINK_GROUPS.map((group) => (
             <div key={group.heading}>
-              <h3 className="eyebrow mb-5 text-gold-soft">{group.heading}</h3>
-              <ul className="space-y-3">
+              <h2 className="eyebrow mb-3 text-gold-soft">{group.heading}</h2>
+              <ul>
                 {group.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-ivory/60 transition-colors hover:text-ivory"
+                      className="inline-flex min-h-9 items-center text-sm text-ivory/70 transition-colors duration-200 hover:text-ivory"
                     >
                       {link.label}
                     </Link>
@@ -114,15 +108,15 @@ export function Footer() {
 
           {SOCIALS.length > 0 && (
             <div>
-              <h3 className="eyebrow mb-5 text-gold-soft">Social</h3>
-              <ul className="space-y-3">
+              <h2 className="eyebrow mb-3 text-gold-soft">Social</h2>
+              <ul>
                 {SOCIALS.map((s) => (
                   <li key={s.label}>
                     <a
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-sm text-ivory/60 transition-colors hover:text-ivory"
+                      className="inline-flex min-h-9 items-center gap-3 text-sm text-ivory/70 transition-colors duration-200 hover:text-ivory"
                     >
                       <s.icon size={16} className="text-gold-soft" />
                       {s.label}
@@ -133,7 +127,7 @@ export function Footer() {
             </div>
           )}
         </div>
-      </div>
+      </nav>
 
       {/* Bottom bar */}
       <div className="border-t border-ivory/10">
@@ -141,7 +135,7 @@ export function Footer() {
           <p className="text-xs text-ivory/60">
             © {new Date().getFullYear()} UMA Designers. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {["UPI", "VISA", "Mastercard", "COD"].map((p) => (
               <span
                 key={p}

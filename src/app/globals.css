@@ -24,6 +24,13 @@
 
   --tracking-widest2: 0.28em;
   --tracking-widest3: 0.4em;
+
+  /* Motion: one easing curve and three durations for the whole storefront.
+     Micro-interactions use duration-200, components duration-300, reveals duration-500. */
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout: the content column every section aligns to. */
+  --container-site: 1440px;
 }
 
 html {

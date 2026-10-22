@@ -77,6 +77,7 @@ export function ContactForm() {
             maxLength={10}
             value={form.phone}
             autoComplete="tel-national"
+            placeholder="10-digit mobile number"
             error={!!errors.phone}
             onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, "") }))}
           />

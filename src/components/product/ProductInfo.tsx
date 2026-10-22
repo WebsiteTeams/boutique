@@ -2,7 +2,7 @@
 
 import { Check, ChevronRight, Heart, ShieldCheck, ShoppingBag, Truck, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/types";
 import { toCartItem } from "@/lib/cart";
 import { productStylistMessage } from "@/lib/config";
@@ -37,10 +37,28 @@ export function ProductInfo({ product }: { product: Product }) {
   const [color, setColor] = useState(product.color);
   const [quantity, setQuantity] = useState(1);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const [ctaVisible, setCtaVisible] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     trackProductView(product.id);
   }, [product.id]);
+
+  // The phone purchase bar steps aside while the main buttons are on screen, so the two never stack.
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setCtaVisible(entry.isIntersecting));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!justAdded) return;
+    const timer = setTimeout(() => setJustAdded(false), 1800);
+    return () => clearTimeout(timer);
+  }, [justAdded]);
 
   const off = discountPercent(product.price, product.mrp);
   const stock = availability(product);
@@ -57,6 +75,7 @@ export function ProductInfo({ product }: { product: Product }) {
     }
     addItem(toCartItem(product, { size, color, quantity: Math.min(quantity, maxQuantity) }));
     showToast("Added to bag", product.name);
+    setJustAdded(true);
     return true;
   };
 
@@ -91,7 +110,7 @@ export function ProductInfo({ product }: { product: Product }) {
           />
         </button>
       </div>
-      <a href="#reviews" className="mt-3 inline-block">
+      <a href="#reviews" className="mt-2 inline-flex min-h-8 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
         <Rating value={product.rating} count={product.reviewCount} />
       </a>
 
@@ -204,16 +223,24 @@ export function ProductInfo({ product }: { product: Product }) {
       </div>
 
       {/* CTAs */}
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button onClick={addToCart} size="lg" className="flex-1" disabled={!product.inStock}>
-          <ShoppingBag width={17} height={17} />
-          {product.inStock ? "Add to Bag" : "Out of Stock"}
+      <div ref={ctaRef} className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Button
+          onClick={addToCart}
+          size="lg"
+          fullWidth
+          className="min-h-14 sm:w-auto sm:flex-1"
+          disabled={!product.inStock}
+          aria-live="polite"
+        >
+          {justAdded ? <Check width={17} height={17} /> : <ShoppingBag width={17} height={17} />}
+          {!product.inStock ? "Out of Stock" : justAdded ? "Added to Bag" : "Add to Bag"}
         </Button>
         <Button
           onClick={buyNow}
           size="lg"
           variant="gold"
-          className="flex-1"
+          fullWidth
+          className="min-h-14 sm:w-auto sm:flex-1"
           disabled={!product.inStock}
         >
           <Zap width={17} height={17} />
@@ -253,7 +280,14 @@ export function ProductInfo({ product }: { product: Product }) {
       </ul>
 
       {/* Sticky mobile purchase bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-clay/60 bg-ivory/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md lg:hidden">
+      <div
+        aria-hidden={ctaVisible}
+        inert={ctaVisible}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-40 border-t border-clay/60 bg-ivory/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md transition-transform duration-300 ease-luxe lg:hidden",
+          ctaVisible ? "translate-y-full" : "translate-y-0"
+        )}
+      >
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs text-mist">{product.name}</p>
@@ -267,7 +301,7 @@ export function ProductInfo({ product }: { product: Product }) {
           >
             <Heart width={18} height={18} strokeWidth={1.6} className={cn(wished && "fill-gold text-gold")} />
           </button>
-          <Button onClick={addToCart} disabled={!product.inStock} className="shrink-0 px-6">
+          <Button onClick={addToCart} disabled={!product.inStock} className="min-h-12 shrink-0 px-6">
             <ShoppingBag width={16} height={16} />
             {product.inStock ? "Add to Bag" : "Sold Out"}
           </Button>

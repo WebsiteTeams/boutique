@@ -2,10 +2,11 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { useDialog } from "@/lib/use-dialog";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { FilterSidebar, type FilterGroup } from "@/components/product/FilterSidebar";
 import { SizeGuide } from "@/components/product/SizeGuide";
@@ -155,18 +156,9 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
     return () => clearTimeout(timer);
   }, [search, urlSearch, updateParams]);
 
-  useEffect(() => {
-    if (!filtersOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setFiltersOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [filtersOpen]);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeFilters = useCallback(() => setFiltersOpen(false), []);
+  useDialog(filtersOpen, drawerRef, closeFilters);
 
   // Toggling one value only touches that group's parameter; everything else is preserved.
   const toggle = (groupId: string, value: string) => {
@@ -268,20 +260,22 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
 
       {/* Controls */}
       <div className="sticky top-16 z-30 border-b border-clay/50 bg-ivory/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-5 py-3.5 sm:px-8 lg:px-10">
-          <label className="relative flex flex-1 items-center lg:max-w-sm">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-2 px-5 py-3 sm:gap-3 sm:px-8 lg:px-10">
+          <label className="relative flex min-w-0 flex-1 items-center lg:max-w-sm">
             <Search width={16} height={16} className="pointer-events-none absolute left-3.5 text-taupe" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${title.toLowerCase()}…`}
-              className="h-10 w-full rounded-full border border-clay bg-white/70 pl-10 pr-9 text-sm text-charcoal placeholder:text-taupe focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold-soft/40"
+              type="search"
+              className="h-11 w-full min-w-0 rounded-full border border-clay bg-white/70 pl-10 pr-10 text-sm text-charcoal placeholder:text-taupe focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold-soft/40 [&::-webkit-search-cancel-button]:hidden"
               aria-label="Search products"
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute right-3 text-taupe hover:text-charcoal"
+                type="button"
+                className="absolute right-1 flex h-9 w-9 items-center justify-center rounded-full text-taupe hover:text-charcoal"
                 aria-label="Clear search"
               >
                 <X width={15} height={15} />
@@ -289,33 +283,37 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
             )}
           </label>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             {showSizeGuide && (
               <button
                 onClick={() => setSizeGuideOpen(true)}
-                className="hidden h-10 items-center rounded-full border border-clay px-4 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-charcoal md:flex"
+                type="button"
+                className="hidden h-11 items-center rounded-full border border-clay px-4 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-charcoal md:flex"
               >
                 Size Guide
               </button>
             )}
             <button
               onClick={() => setFiltersOpen(true)}
-              className="relative flex h-10 items-center gap-2 rounded-full border border-clay px-4 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-charcoal lg:hidden"
-              aria-label="Open filters"
+              type="button"
+              className="relative flex h-11 items-center gap-2 whitespace-nowrap rounded-full border border-clay px-4 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-charcoal lg:hidden"
+              aria-haspopup="dialog"
+              aria-expanded={filtersOpen}
             >
-              <SlidersHorizontal width={15} height={15} />
-              Filters
+              <SlidersHorizontal width={15} height={15} aria-hidden />
+              <span className="sm:hidden">Filter &amp; Sort</span>
+              <span className="hidden sm:inline">Filters</span>
               {activeCount > 0 && (
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[0.6rem] text-white">
                   {activeCount}
                 </span>
               )}
             </button>
-            <label className="relative">
+            <label className="relative hidden sm:block">
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="h-10 appearance-none rounded-full border border-clay bg-white/70 pl-4 pr-9 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal focus:border-gold focus:outline-none"
+                className="h-11 appearance-none rounded-full border border-clay bg-white/70 pl-4 pr-9 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-charcoal focus:border-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-soft/40"
                 aria-label="Sort products"
               >
                 {SORTS.map((s) => (
@@ -336,8 +334,8 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
       <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         <div className="flex gap-10">
           {/* Desktop sidebar */}
-          <aside className="hidden w-64 shrink-0 lg:block">
-            <div className="sticky top-36">
+          <aside className="hidden w-64 shrink-0 lg:block" aria-label="Filters">
+            <div>
               <FilterSidebar
                 groups={groups}
                 selected={selected}
@@ -349,7 +347,8 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
           </aside>
 
           <div className="min-w-0 flex-1">
-            <p className="mb-6 text-sm text-mist">
+            <h2 className="sr-only">Products</h2>
+            <p className="mb-6 text-sm text-mist" aria-live="polite">
               {results.length} {results.length === 1 ? "piece" : "pieces"}
               {search && (
                 <>
@@ -371,19 +370,22 @@ function ShopInner({ products: list, title, description, showSizeGuide, image }:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="absolute inset-0 bg-ink/50 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} aria-hidden />
+            <div className="absolute inset-0 bg-ink/50" onClick={() => setFiltersOpen(false)} aria-hidden />
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute left-0 top-0 h-full"
+              ref={drawerRef}
+              className="absolute left-0 top-0 h-full max-w-[88vw]"
               role="dialog"
               aria-modal="true"
-              aria-label="Filters"
+              aria-label="Filter and sort"
             >
               <FilterSidebar
                 mobile
+                sort={{ value: sort, options: SORTS, onChange: setSort }}
+                resultCount={results.length}
                 groups={groups}
                 selected={selected}
                 onChange={toggle}

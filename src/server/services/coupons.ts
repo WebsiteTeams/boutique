@@ -1,13 +1,17 @@
-import { desc, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { couponIneligibleReason, type CouponRule } from "@/lib/pricing";
-import { db, type Database } from "@/server/db/client";
-import { coupons } from "@/server/db/schema";
+import { Coupons, type CouponRow } from "@/server/db/models";
 import { badRequest, conflict, notFound } from "@/server/utils/errors";
 import { now } from "@/server/utils/ids";
 import type { couponSchema } from "@/server/validators";
 
-export type CouponRow = typeof coupons.$inferSelect;
+export type { CouponRow };
+
+/** Coupon documents use the code as `_id`. */
+const toRow = (doc: { _id: string } & Omit<CouponRow, "code">): CouponRow => {
+  const { _id, ...rest } = doc;
+  return { code: _id, ...rest };
+};
 
 export const toCouponRule = (row: CouponRow): CouponRule => ({
   code: row.code,
@@ -23,7 +27,8 @@ export const toCouponRule = (row: CouponRow): CouponRule => ({
  * Throws a customer-facing error when it cannot be applied.
  */
 export async function resolveCoupon(code: string, subtotal: number): Promise<CouponRule> {
-  const [row] = await db.select().from(coupons).where(eq(coupons.code, code.toUpperCase())).limit(1);
+  const doc = await Coupons.findById(code.toUpperCase()).lean();
+  const row = doc ? toRow(doc) : null;
   if (!row || !row.isActive) throw badRequest("This coupon code is not valid.");
   if (row.expiresAt && row.expiresAt < now()) throw badRequest("This coupon has expired.");
   if (row.usageLimit != null && row.usedCount >= row.usageLimit) {
@@ -35,43 +40,36 @@ export async function resolveCoupon(code: string, subtotal: number): Promise<Cou
   return rule;
 }
 
-export async function recordCouponUse(tx: Pick<Database, "update">, code: string) {
-  await tx
-    .update(coupons)
-    .set({ usedCount: sql`${coupons.usedCount} + 1` })
-    .where(eq(coupons.code, code));
+export async function recordCouponUse(code: string) {
+  await Coupons.updateOne({ _id: code }, { $inc: { usedCount: 1 } });
 }
 
-export const listCoupons = () => db.select().from(coupons).orderBy(desc(coupons.createdAt));
+export const listCoupons = async () => (await Coupons.find().sort({ createdAt: -1 }).lean()).map(toRow);
 
 export async function createCoupon(input: z.infer<typeof couponSchema>) {
-  const [existing] = await db.select().from(coupons).where(eq(coupons.code, input.code)).limit(1);
-  if (existing) throw conflict("A coupon with this code already exists.");
-  const [row] = await db
-    .insert(coupons)
-    .values({
-      code: input.code,
-      description: input.description,
-      type: input.type,
-      value: input.value,
-      minSubtotal: input.minSubtotal,
-      maxDiscount: input.maxDiscount ?? null,
-      usageLimit: input.usageLimit ?? null,
-      expiresAt: input.expiresAt ? `${input.expiresAt}T23:59:59.999Z` : null,
-      isActive: input.isActive,
-      createdAt: now(),
-    })
-    .returning();
-  return row;
+  if (await Coupons.exists({ _id: input.code })) throw conflict("A coupon with this code already exists.");
+  const doc = await Coupons.create({
+    _id: input.code,
+    description: input.description,
+    type: input.type,
+    value: input.value,
+    minSubtotal: input.minSubtotal,
+    maxDiscount: input.maxDiscount ?? null,
+    usageLimit: input.usageLimit ?? null,
+    expiresAt: input.expiresAt ? `${input.expiresAt}T23:59:59.999Z` : null,
+    isActive: input.isActive,
+    createdAt: now(),
+  });
+  return toRow(doc.toObject());
 }
 
 export async function setCouponActive(code: string, isActive: boolean) {
-  const [row] = await db.update(coupons).set({ isActive }).where(eq(coupons.code, code)).returning();
-  if (!row) throw notFound("Coupon not found.");
-  return row;
+  const doc = await Coupons.findOneAndUpdate({ _id: code }, { $set: { isActive } }, { new: true }).lean();
+  if (!doc) throw notFound("Coupon not found.");
+  return toRow(doc);
 }
 
 export async function deleteCoupon(code: string) {
-  const deleted = await db.delete(coupons).where(eq(coupons.code, code)).returning({ code: coupons.code });
-  if (deleted.length === 0) throw notFound("Coupon not found.");
+  const res = await Coupons.deleteOne({ _id: code });
+  if (res.deletedCount === 0) throw notFound("Coupon not found.");
 }

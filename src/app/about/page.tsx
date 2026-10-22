@@ -1,11 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { HandHeart, Leaf, Ruler, Scissors } from "lucide-react";
 import { collections } from "@/lib/data";
 import { ImageReveal, Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { LinkButton } from "@/components/ui/Button";
+import { CollectionCard } from "@/components/home/CollectionCard";
 
 const PILLARS = [
   {
@@ -109,10 +108,10 @@ export default function AboutPage() {
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold-soft">
                   <p.icon width={20} height={20} />
                 </span>
-                <span>
+                <div>
                   <h3 className="mb-1.5 text-lg text-ivory">{p.title}</h3>
-                  <p className="text-sm leading-relaxed text-mist">{p.text}</p>
-                </span>
+                  <p className="text-sm leading-relaxed text-ivory/70">{p.text}</p>
+                </div>
               </RevealItem>
             ))}
           </RevealGroup>
@@ -122,41 +121,17 @@ export default function AboutPage() {
       {/* Collections */}
       <section className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-10 lg:py-24">
         <SectionHeading eyebrow="Curated for You" title="Shop the Edits" align="center" />
-        <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2">
+        <div className="mt-12 grid gap-6 sm:grid-cols-3 lg:gap-8">
           {collections.map((c, i) => (
-            <RevealItem
+            <CollectionCard
               key={c.id}
-              className={i === 0 ? "sm:col-span-2" : ""}
-            >
-              <LinkButton
-                href="/collections"
-                variant="ghost"
-                className="group relative block h-full w-full overflow-hidden p-0"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <motion.span className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/10 to-transparent" />
-                <span className="absolute inset-x-6 bottom-6 flex items-end justify-between text-left">
-                  <span>
-                    <span className="type-label-sm block text-gold-soft">
-                      {c.tagline}
-                    </span>
-                    <span className="type-heading-lg mt-1 block text-ivory">
-                      {c.name}
-                    </span>
-                  </span>
-                  <span className="rounded-full border border-ivory/40 px-4 py-2 text-xs uppercase tracking-[0.16em] text-ivory backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-charcoal">
-                    Explore
-                  </span>
-                </span>
-              </LinkButton>
-            </RevealItem>
+              collection={c}
+              revealDelay={i * 0.06}
+              className={i === 0 ? "sm:col-span-3" : ""}
+              aspect={i === 0 ? "aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]" : "aspect-[4/5]"}
+            />
           ))}
-        </RevealGroup>
+        </div>
       </section>
     </>
   );

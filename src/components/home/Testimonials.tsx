@@ -121,23 +121,30 @@ export function Testimonials() {
             ))}
           </ul>
 
-          <div className="mt-8 flex items-center justify-center gap-2">
+          <div className="mt-6 flex items-center justify-center gap-0.5">
             {reviews.map((review, i) => (
               <button
                 key={review.id}
                 onClick={() => scrollToIndex(i)}
                 aria-label={`Go to review ${i + 1}`}
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
-                  active === i ? "w-6 bg-gold-deep" : "w-1.5 bg-clay hover:bg-taupe"
-                )}
-              />
+                aria-current={active === i ? "true" : undefined}
+                className="group flex h-8 min-w-8 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-gold"
+              >
+                {/* The dot stays small; the button around it is a full 32px target. */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "block h-1.5 rounded-full transition-all duration-300",
+                    active === i ? "w-6 bg-gold-deep" : "w-1.5 bg-clay group-hover:bg-taupe"
+                  )}
+                />
+              </button>
             ))}
           </div>
         </div>
 
         {/* lg: static grid */}
-        <div className="hidden grid gap-y-10 lg:grid-cols-4 lg:gap-x-10 lg:grid">
+        <div className="hidden gap-y-10 lg:grid lg:grid-cols-4 lg:gap-x-10">
           {reviews.map((review, i) => (
             <motion.figure
               key={review.id}

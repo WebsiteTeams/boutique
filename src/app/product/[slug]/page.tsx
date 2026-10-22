@@ -96,73 +96,74 @@ export default async function ProductPage({ params }: PageProps) {
       </div>
 
       {/* Product */}
-      <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-8 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-12">
+      <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-8 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-12" aria-label="Product details">
         <ProductGallery
           images={product.images}
           videos={product.videos}
           name={product.name}
           className="lg:sticky lg:top-28 lg:self-start"
         />
-        <ProductInfo product={product} />
+        <div className="min-w-0">
+          <ProductInfo product={product} />
+          <div className="mt-10">
+            <Accordion>
+              <AccordionItem title="Description" defaultOpen>
+                <p className="text-mist">{product.description}</p>
+              </AccordionItem>
+              {product.details.length > 0 && (
+                <AccordionItem title="Details & Specifications">
+                  <ul className="space-y-1.5">
+                    {product.details.map((d) => (
+                      <li key={d} className="flex gap-2 text-mist">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" />
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionItem>
+              )}
+              <AccordionItem title="Fabric">
+                <p className="text-mist">{product.fabric} — selected for drape, comfort and longevity.</p>
+              </AccordionItem>
+              {product.care.length > 0 && (
+                <AccordionItem title="Care Instructions">
+                  <ul className="space-y-1.5">
+                    {product.care.map((c) => (
+                      <li key={c} className="flex gap-2 text-mist">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionItem>
+              )}
+              <AccordionItem title="Delivery Information">
+                <p className="text-mist">
+                  {product.estimatedDelivery}.{" "}
+                  {product.deliveryType === "made_to_order"
+                    ? "This piece is made to order, so it is crafted after you place your order."
+                    : "Dispatched from our boutique once your order is confirmed."}{" "}
+                  Free standard delivery on orders above {formatINR(FREE_DELIVERY_THRESHOLD)}.{" "}
+                  <Link href="/shipping" className="text-gold-deep underline underline-offset-4">
+                    Shipping details
+                  </Link>
+                </p>
+              </AccordionItem>
+              <AccordionItem title="Returns">
+                <p className="text-mist">
+                  {product.deliveryType === "made_to_order"
+                    ? "Customised and made-to-order pieces are non-returnable. Fit alterations are supported — contact us within 7 days of delivery."
+                    : "Unworn items in original condition may be returned within 7 days of delivery."}{" "}
+                  <Link href="/returns" className="text-gold-deep underline underline-offset-4">
+                    Returns policy
+                  </Link>
+                </p>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
       </section>
 
-      {/* Accordions */}
-      <section className="mx-auto max-w-3xl px-5 pb-8 sm:px-8 lg:px-10">
-        <Accordion>
-          <AccordionItem title="Description" defaultOpen>
-            <p className="text-mist">{product.description}</p>
-          </AccordionItem>
-          {product.details.length > 0 && (
-            <AccordionItem title="Details & Specifications">
-              <ul className="space-y-1.5">
-                {product.details.map((d) => (
-                  <li key={d} className="flex gap-2 text-mist">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" />
-                    {d}
-                  </li>
-                ))}
-              </ul>
-            </AccordionItem>
-          )}
-          <AccordionItem title="Fabric">
-            <p className="text-mist">{product.fabric} — selected for drape, comfort and longevity.</p>
-          </AccordionItem>
-          {product.care.length > 0 && (
-            <AccordionItem title="Care Instructions">
-              <ul className="space-y-1.5">
-                {product.care.map((c) => (
-                  <li key={c} className="flex gap-2 text-mist">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" />
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            </AccordionItem>
-          )}
-          <AccordionItem title="Delivery Information">
-            <p className="text-mist">
-              {product.estimatedDelivery}.{" "}
-              {product.deliveryType === "made_to_order"
-                ? "This piece is made to order, so it is crafted after you place your order."
-                : "Dispatched from our boutique once your order is confirmed."}{" "}
-              Free standard delivery on orders above {formatINR(FREE_DELIVERY_THRESHOLD)}.{" "}
-              <Link href="/shipping" className="text-gold-deep underline underline-offset-4">
-                Shipping details
-              </Link>
-            </p>
-          </AccordionItem>
-          <AccordionItem title="Returns">
-            <p className="text-mist">
-              {product.deliveryType === "made_to_order"
-                ? "Customised and made-to-order pieces are non-returnable. Fit alterations are supported — contact us within 7 days of delivery."
-                : "Unworn items in original condition may be returned within 7 days of delivery."}{" "}
-              <Link href="/returns" className="text-gold-deep underline underline-offset-4">
-                Returns policy
-              </Link>
-            </p>
-          </AccordionItem>
-        </Accordion>
-      </section>
 
       <ProductReviews
         slug={product.slug}

@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { errorMessage } from "@/lib/api";
-import { customizationRows } from "@/lib/blouse";
+import { buildCustomization, customizationRows } from "@/lib/blouse";
+import { priceBlouse, type BlouseCatalog } from "@/lib/blouse-pricing";
+import { useApi } from "@/lib/use-api";
 import { cartItemHref } from "@/lib/cart";
 import { amountToFreeDelivery, couponIneligibleReason, FREE_DELIVERY_THRESHOLD } from "@/lib/pricing";
 import { useCart, useToast } from "@/context/store";
@@ -14,6 +16,7 @@ import { cn, formatINR } from "@/lib/utils";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { RecommendedForYou } from "@/components/product/ProductShelf";
 
 export default function CartPage() {
   const {
@@ -27,7 +30,20 @@ export default function CartPage() {
     applyCoupon: applyCouponCode,
     removeCoupon,
     totalsFor,
+    repriceCustomBlouse,
   } = useCart();
+  // Custom blouses are re-checked against today's prices so the customer sees any change before checkout.
+  const hasCustom = items.some((i) => i.customization);
+  const catalog = useApi<{ catalog: BlouseCatalog }>(hasCustom ? "/api/custom-blouse/catalog" : null).data?.catalog ?? null;
+  const priceCheck = (customization: NonNullable<(typeof items)[number]["customization"]>) => {
+    if (!catalog) return null;
+    const result = priceBlouse(catalog, { designId: customization.designId, options: customization.options });
+    if (!result.ok) return { state: "unavailable" as const };
+    if (result.breakdown.total !== customization.basePrice) {
+      return { state: "changed" as const, next: buildCustomization(customization, result.breakdown) };
+    }
+    return null;
+  };
   const { showToast } = useToast();
   const router = useRouter();
   const [coupon, setCoupon] = useState("");
@@ -63,18 +79,22 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-2xl px-5 pt-32 pb-16 sm:px-8 lg:pt-40">
-        <h1 className="type-heading-xl mb-8 text-center text-charcoal">Your Bag</h1>
-        <div className="rounded-2xl border border-clay/60 bg-white/60">
-          <EmptyState
-            icon={<ShoppingBag width={26} height={26} />}
-            title="Your bag is empty"
-            description="Fill it with sarees, chudithars and bespoke blouses you'll love."
-            actionLabel="Start Shopping"
-            href="/sarees"
-          />
+      <>
+        <div className="mx-auto max-w-2xl px-5 pt-32 pb-16 sm:px-8 lg:pt-40">
+          <h1 className="type-heading-xl mb-8 text-center text-charcoal">Your Bag</h1>
+          <div className="rounded-2xl border border-clay/60 bg-white/60">
+            <EmptyState
+              icon={<ShoppingBag width={26} height={26} />}
+              title="Your bag is empty"
+              titleAs="h2"
+              description="Handwoven sarees, easy chudithars and blouses stitched to your measurements are waiting."
+              actionLabel="Continue Shopping"
+              href="/shop"
+            />
+          </div>
         </div>
-      </div>
+        <RecommendedForYou />
+      </>
     );
   }
 
@@ -149,6 +169,35 @@ export default function CartPage() {
                           <Trash2 width={16} height={16} />
                         </button>
                       </div>
+
+                      {item.customization &&
+                        (() => {
+                          const check = priceCheck(item.customization);
+                          if (!check) return null;
+                          return check.state === "unavailable" ? (
+                            <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs text-amber-900">
+                              A choice in this blouse is no longer offered.{" "}
+                              <Link href="/custom-blouse" className="font-medium underline underline-offset-2">
+                                Design it again
+                              </Link>{" "}
+                              and remove this one to continue.
+                            </p>
+                          ) : (
+                            <div role="status" className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs text-amber-900">
+                              <span>
+                                The price changed from {formatINR(item.customization.basePrice)} to{" "}
+                                <strong>{formatINR(check.next.basePrice)}</strong>.
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => repriceCustomBlouse(item.key, check.next)}
+                                className="min-h-8 rounded-full bg-charcoal px-3 font-medium text-ivory"
+                              >
+                                Accept new price
+                              </button>
+                            </div>
+                          );
+                        })()}
 
                       {item.customization && (
                         <dl className="mt-2 grid gap-x-4 gap-y-1 rounded-lg bg-cream px-3 py-2.5 text-xs sm:grid-cols-2">

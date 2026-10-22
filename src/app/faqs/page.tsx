@@ -1,5 +1,12 @@
+import { pageMetadata } from "@/lib/seo";
 import { InfoPage } from "@/components/ui/InfoPage";
 import { Accordion, AccordionItem } from "@/components/ui/Accordion";
+
+export const metadata = pageMetadata({
+  title: "FAQs",
+  description: "Answers about ordering, payment, sizing, custom blouses, delivery and returns at UMA Designers.",
+  path: "/faqs",
+});
 
 const GROUPS = [
   {
@@ -32,8 +39,8 @@ const GROUPS = [
   {
     category: "The Boutique",
     items: [
-      { q: "Can I visit the boutique?", a: "Yes — we're at #12, Boutique Lane, T Nagar, Chennai 600017, open 10 AM to 8:30 PM every day. Bespoke consultations are by appointment on weekends." },
-      { q: "Do you offer trousseau styling?", a: "We do. Book a trousseau consultation and our stylists will curate a full wedding wardrobe for you, including bespoke blouses for every saree." },
+      { q: "Can I visit the boutique?", a: "Yes — we're at #12, Boutique Lane, T Nagar, Chennai 600017, open 10 AM to 8:30 PM every day. Walk in any time, or message us first and a stylist will be ready for you." },
+      { q: "Do you offer trousseau styling?", a: "We do. Get in touch to arrange a trousseau consultation and our stylists will curate a full wedding wardrobe for you, including bespoke blouses for every saree." },
       { q: "Can I gift a UMA piece?", a: "Absolutely — every order arrives in signature gift-ready packaging. You can also add a handwritten note at checkout." },
     ],
   },

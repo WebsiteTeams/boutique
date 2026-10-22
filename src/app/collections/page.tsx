@@ -62,18 +62,18 @@ export default async function CollectionsPage() {
         <RevealGroup className="grid gap-5 md:grid-cols-2 lg:gap-8">
           {collections.map((c, i) => (
             <RevealItem key={c.id} className={i % 2 === 1 ? "md:translate-y-14" : ""}>
-              <Link href={`/collections/${c.id}`} className="group relative block w-full overflow-hidden bg-ink">
+              <Link href={`/collections/${c.id}`} className="group relative block w-full overflow-hidden bg-ink outline-offset-4 focus-visible:outline-2 focus-visible:outline-gold">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={c.image}
                   alt=""
                   loading="lazy"
-                  className="aspect-[4/5] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+                  className="aspect-[4/5] w-full object-cover transition-transform duration-[1200ms] ease-luxe motion-safe:group-hover:scale-[1.04]"
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent" />
+                <span className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/45 via-40% to-transparent to-75%" />
                 <span className="absolute inset-x-0 bottom-0 flex flex-col p-7 sm:p-9">
-                  <span className="eyebrow flex items-center gap-2 text-gold-soft">
-                    <span className="h-px w-6 bg-gold-soft" />
+                  <span className="eyebrow flex items-center gap-2 text-ivory/85">
+                    <span className="h-px w-6 bg-gold-soft" aria-hidden />
                     {c.tagline}
                   </span>
                   <span className="type-heading-xl mt-3 block text-ivory">{c.name}</span>
@@ -113,8 +113,8 @@ export default async function CollectionsPage() {
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <StylistButton />
-            <LinkButton href="/appointments" variant="ghost">
-              Book an Appointment
+            <LinkButton href="/contact" variant="ghost">
+              Contact Us
               <ArrowRight width={16} height={16} />
             </LinkButton>
           </div>

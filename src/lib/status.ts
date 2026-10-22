@@ -1,6 +1,6 @@
 /**
  * Centralised status vocabularies for orders, payments, custom blouses,
- * appointments, stock, reviews and contact messages. Shared by the API,
+ * stock, reviews and contact messages. Shared by the API,
  * the storefront and the admin panel.
  */
 
@@ -95,29 +95,6 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 
 export const paymentMethodLabel = (method: string) =>
   PAYMENT_METHOD_LABELS[method as PaymentMethod] ?? method;
-
-export const APPOINTMENT_STATUSES = ["Pending", "Confirmed", "Completed", "Cancelled", "Rescheduled"] as const;
-export type AppointmentStatus = (typeof APPOINTMENT_STATUSES)[number];
-
-export const APPOINTMENT_PURPOSES = [
-  "Bridal",
-  "Wedding Guest",
-  "Custom Blouse",
-  "Designer Consultation",
-  "Saree Selection",
-] as const;
-
-export const APPOINTMENT_SLOTS = [
-  "10:30",
-  "11:30",
-  "12:30",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
-] as const;
 
 export const REVIEW_STATUSES = ["Pending", "Approved", "Rejected"] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];

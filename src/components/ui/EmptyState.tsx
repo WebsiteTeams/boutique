@@ -11,6 +11,8 @@ interface EmptyStateProps {
   onAction?: () => void;
   href?: string;
   className?: string;
+  /** Heading level for the title; use h2 when the empty state is the main content under the page h1. */
+  titleAs?: "h2" | "h3";
 }
 
 export function EmptyState({
@@ -21,6 +23,7 @@ export function EmptyState({
   onAction,
   href,
   className,
+  titleAs: Title = "h3",
 }: EmptyStateProps) {
   return (
     <div
@@ -32,7 +35,7 @@ export function EmptyState({
       <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-clay bg-cream text-gold-deep">
         {icon}
       </div>
-      <h3 className="type-heading-lg text-charcoal">{title}</h3>
+      <Title className="type-heading-lg text-charcoal">{title}</Title>
       {description && (
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-mist">{description}</p>
       )}

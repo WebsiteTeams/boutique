@@ -7,14 +7,6 @@ export const P: {
   instagram: string[];
   categories: { sarees: string; chudithars: string; blouses: string };
   collections: { wedding: string; festive: string; everyday: string; bridal: string };
-  customization: {
-    neck: string;
-    sleeve: string;
-    back: string;
-    embroidery: string;
-    border: string;
-    stitching: string;
-  };
   products: Record<string, string[]>;
 } = {
   hero: "/images/hero/hero-main.png",
@@ -38,14 +30,6 @@ export const P: {
     festive: "/images/collections/collection-festive.png",
     everyday: "/images/collections/collection-everyday.png",
     bridal: "/images/collections/collection-bridal.png",
-  },
-  customization: {
-    neck: "/images/customization/neck.png",
-    sleeve: "/images/customization/sleeve.png",
-    back: "/images/customization/back.png",
-    embroidery: "/images/customization/embroidery.png",
-    border: "/images/customization/border.png",
-    stitching: "/images/customization/stitching.png",
   },
   products: {
     "pr-01": [

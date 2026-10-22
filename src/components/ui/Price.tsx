@@ -17,7 +17,7 @@ export function Price({ price, mrp, size = "md", className }: PriceProps) {
   const off = discountPercent(price, mrp);
   const s = sizeMap[size];
   return (
-    <div className={cn("flex items-baseline gap-2", className)}>
+    <div className={cn("flex flex-wrap items-baseline gap-x-2 gap-y-0.5", className)}>
       <span className={cn("font-semibold tabular-nums text-charcoal", s.main)}>
         {formatINR(price)}
       </span>
@@ -27,7 +27,7 @@ export function Price({ price, mrp, size = "md", className }: PriceProps) {
             {formatINR(mrp)}
           </span>
           {off && (
-            <span className={cn("font-medium uppercase tracking-[0.08em] text-gold-deep", s.off)}>
+            <span className={cn("whitespace-nowrap font-medium uppercase tracking-[0.08em] text-gold-deep", s.off)}>
               {off}% OFF
             </span>
           )}

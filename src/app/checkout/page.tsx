@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Address, Order, SavedAddress } from "@/types";
 import { api, errorFields, errorMessage } from "@/lib/api";
 import { customizationRows } from "@/lib/blouse";
@@ -78,6 +78,15 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponBusy, setCouponBusy] = useState(false);
   const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
+  // Set once an order is placed, so clearing the bag does not trigger the empty-bag redirect.
+  const orderCompleted = useRef(false);
+
+  // An empty bag has nothing to check out: send the shopper to the bag page,
+  // but only after the saved bag has loaded and never right after an order.
+  const bagIsEmpty = hydrated && ready && items.length === 0 && !failed;
+  useEffect(() => {
+    if (bagIsEmpty && !orderCompleted.current) router.replace("/cart");
+  }, [bagIsEmpty, router]);
 
   // Prefill contact details from the signed-in account (once per user).
   if (user && prefilledFor !== user.id) {
@@ -175,6 +184,7 @@ export default function CheckoutPage() {
 
   /** The cart is cleared only once the order exists and (for online payment) is verified as paid. */
   const completeOrder = (orderId: string) => {
+    orderCompleted.current = true;
     clearCart();
     router.push(`/order-success?order=${encodeURIComponent(orderId)}`);
   };
@@ -223,6 +233,9 @@ export default function CheckoutPage() {
             customization: i.customization
               ? {
                   options: i.customization.options,
+                  designId: i.customization.designId ?? null,
+                  // The server refuses the order if this no longer matches its own price.
+                  expectedPrice: i.customization.basePrice,
                   measurements: i.customization.measurements,
                   measurementProfile: i.customization.measurementProfile,
                   instructions: i.customization.instructions,
@@ -268,23 +281,11 @@ export default function CheckoutPage() {
 
   /* ---------- Gate states ---------- */
 
-  if (!hydrated || !ready) {
+  if (!hydrated || !ready || (items.length === 0 && !failed)) {
     return (
       <div className="mx-auto max-w-[1440px] px-5 pb-16 pt-32 sm:px-8 lg:px-10 lg:pt-40" aria-busy="true">
         <h1 className="type-heading-xl mb-8 text-charcoal">Checkout</h1>
         <div className="h-72 animate-pulse rounded-2xl bg-cream/70" />
-      </div>
-    );
-  }
-
-  if (items.length === 0 && !failed) {
-    return (
-      <div className="mx-auto max-w-xl px-5 pt-32 pb-20 text-center sm:px-8 lg:pt-40">
-        <h1 className="type-heading-xl text-charcoal">Checkout</h1>
-        <p className="mt-3 text-mist">Your bag is empty — add a few pieces to begin.</p>
-        <LinkButton className="mt-6" href="/sarees">
-          Browse the Collection
-        </LinkButton>
       </div>
     );
   }

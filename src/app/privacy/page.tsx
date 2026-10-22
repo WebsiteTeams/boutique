@@ -1,4 +1,11 @@
+import { pageMetadata } from "@/lib/seo";
 import { InfoPage } from "@/components/ui/InfoPage";
+
+export const metadata = pageMetadata({
+  title: "Privacy Policy",
+  description: "How UMA Designers collects, uses and protects your personal information.",
+  path: "/privacy",
+});
 
 const SECTIONS = [
   {

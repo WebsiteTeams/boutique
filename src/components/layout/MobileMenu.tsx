@@ -18,7 +18,6 @@ const LINKS = [
   { label: "Collections", href: "/collections" },
   { label: "Lookbook", href: "/lookbook" },
   { label: "New Arrivals", href: "/new-arrivals" },
-  { label: "Book an Appointment", href: "/appointments" },
   { label: "About", href: "/about" },
 ];
 

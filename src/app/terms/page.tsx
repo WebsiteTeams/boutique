@@ -1,4 +1,11 @@
+import { pageMetadata } from "@/lib/seo";
 import { InfoPage } from "@/components/ui/InfoPage";
+
+export const metadata = pageMetadata({
+  title: "Terms of Service",
+  description: "The terms that apply when you shop with UMA Designers.",
+  path: "/terms",
+});
 
 const SECTIONS = [
   {

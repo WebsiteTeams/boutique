@@ -19,8 +19,10 @@ export function OrderDetails({ order, showTimeline = true }: { order: Order; sho
         {order.items.map((item) => (
           <li key={item.id} className="flex items-start gap-4">
             <span className="h-16 w-14 shrink-0 overflow-hidden rounded-lg bg-cream">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.image} alt="" className="h-full w-full object-cover" />
+              {item.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.image} alt="" className="h-full w-full object-cover" />
+              ) : null}
             </span>
             <div className="min-w-0 flex-1">
               {item.slug && !item.customization ? (

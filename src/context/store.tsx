@@ -216,6 +216,8 @@ interface CartContextValue {
   subtotal: number;
   hasCustomBlouse: boolean;
   addCustomBlouse: (customization: CustomizationSummary) => void;
+  /** Replaces a custom blouse's priced customization after the customer accepts a new price. */
+  repriceCustomBlouse: (key: string, customization: CustomizationSummary) => void;
   coupon: CouponRule | null;
   /** Validates the code with the server and applies it. Throws with a customer-facing message. */
   applyCoupon: (code: string) => Promise<CouponRule>;
@@ -256,6 +258,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         : [...prev.items, { ...item, quantity: Math.min(MAX_QUANTITY, item.quantity) }];
       return { ...prev, items: next };
     });
+  }, []);
+
+  const repriceCustomBlouse = useCallback((key: string, customization: CustomizationSummary) => {
+    cartStore.set((prev) => ({
+      ...prev,
+      items: prev.items.map((i) =>
+        i.key === key && i.customization
+          ? { ...i, customization, price: customization.basePrice, color: `${customization.neck} · ${customization.back}` }
+          : i
+      ),
+    }));
   }, []);
 
   const removeItem = useCallback((key: string) => {
@@ -391,6 +404,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       hasCustomBlouse,
       addCustomBlouse,
+      repriceCustomBlouse,
       coupon,
       applyCoupon,
       removeCoupon,
@@ -410,6 +424,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       hasCustomBlouse,
       addCustomBlouse,
+      repriceCustomBlouse,
       coupon,
       applyCoupon,
       removeCoupon,

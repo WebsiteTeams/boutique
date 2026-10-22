@@ -1,36 +1,32 @@
-import { mkdirSync } from "node:fs";
-import path from "node:path";
-import { createClient, type Client } from "@libsql/client";
-import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
+import mongoose from "mongoose";
 import { env } from "@/server/config/env";
-import * as schema from "./schema";
 
-export type Database = LibSQLDatabase<typeof schema>;
+// Reuse one connection across hot reloads in development and across requests in production.
+const globalForDb = globalThis as unknown as { __umaMongo?: Promise<typeof mongoose> };
 
-// Reuse one connection across hot reloads in development.
-const globalForDb = globalThis as unknown as { __umaDb?: { client: Client; db: Database } };
-
-function connect() {
-  const url = env.databaseUrl;
-  if (url.startsWith("file:")) {
-    mkdirSync(path.dirname(path.resolve(url.slice("file:".length))), { recursive: true });
+/**
+ * Connects to MongoDB once and returns the shared Mongoose instance.
+ * Every service awaits this before touching a model, so nothing connects at build time.
+ */
+export function connectDb(): Promise<typeof mongoose> {
+  if (!globalForDb.__umaMongo) {
+    globalForDb.__umaMongo = mongoose
+      .connect(env.mongodbUri, {
+        // Fail fast with a clear error instead of hanging when MongoDB is not running.
+        serverSelectionTimeoutMS: 5000,
+        autoIndex: true,
+      })
+      .catch((error) => {
+        globalForDb.__umaMongo = undefined;
+        throw error;
+      });
   }
-  const client = createClient({ url, authToken: env.databaseAuthToken });
-  return { client, db: drizzle(client, { schema }) };
+  return globalForDb.__umaMongo;
 }
 
-export function getDb(): Database {
-  if (!globalForDb.__umaDb) globalForDb.__umaDb = connect();
-  return globalForDb.__umaDb.db;
+export async function disconnectDb() {
+  if (globalForDb.__umaMongo) {
+    await (await globalForDb.__umaMongo).disconnect();
+    globalForDb.__umaMongo = undefined;
+  }
 }
-
-/** Lazy proxy so importing this module never opens a connection at build time. */
-export const db: Database = new Proxy({} as Database, {
-  get(_target, prop) {
-    const real = getDb() as unknown as Record<string | symbol, unknown>;
-    const value = real[prop];
-    return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(real) : value;
-  },
-});
-
-export { schema };

@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Uploads and local database files are runtime data, never part of the server bundle.
+  outputFileTracingExcludes: { "**": ["./data/**/*"] },
+  // Online appointment booking was retired; old links land on the contact page.
+  async redirects() {
+    return [{ source: "/appointments", destination: "/contact", permanent: true }];
+  },
   images: {
     remotePatterns: [
       {

@@ -3,7 +3,8 @@ import { listCollections } from "@/server/services/admin";
 import { listProducts } from "@/server/services/products";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { LinkButton } from "@/components/ui/Button";
+import { EditorialCard } from "@/components/ui/EditorialCard";
+import { CollectionCard } from "@/components/home/CollectionCard";
 
 const LOOKS = [
   {
@@ -81,64 +82,36 @@ export default async function LookbookPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-10 lg:py-24">
-        <RevealGroup className="grid gap-8 sm:grid-cols-2">
-          {LOOKS.map((look) => (
-            <RevealItem key={look.id} className={look.wide ? "sm:col-span-2" : ""}>
-              <LinkButton
-                href={shot(look.product) ? `/product/${shot(look.product)?.slug}` : "/shop"}
-                variant="ghost"
-                className="group relative block w-full overflow-hidden rounded-2xl p-0"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={look.image}
-                  alt={look.name}
-                  className={
-                    (look.wide ? "aspect-[21/9]" : "aspect-[4/5]") +
-                    " w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  }
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-10 lg:py-24" aria-labelledby="looks-heading">
+        <h2 id="looks-heading" className="sr-only">This season&apos;s looks</h2>
+        <RevealGroup className="grid gap-6 sm:grid-cols-2 lg:gap-8">
+          {LOOKS.map((look) => {
+            const product = shot(look.product);
+            return (
+              <RevealItem key={look.id} className={look.wide ? "sm:col-span-2" : ""}>
+                <EditorialCard
+                  href={product ? `/product/${product.slug}` : "/shop"}
+                  image={look.image}
+                  alt=""
+                  title={look.name}
+                  caption={look.caption}
+                  cta="Shop the look"
+                  aspect={look.wide ? "aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]" : "aspect-[4/5]"}
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
-                <span className="absolute inset-x-6 bottom-6 flex flex-wrap items-end justify-between gap-3 text-left">
-                  <span>
-                    <span className="type-heading-lg block text-ivory">{look.name}</span>
-                    <span className="mt-1 block max-w-sm type-body-sm text-ivory/80">{look.caption}</span>
-                  </span>
-                  <span className="type-label-sm rounded-full border border-ivory/50 px-4 py-2 text-ivory backdrop-blur-sm transition-colors group-hover:bg-ivory group-hover:text-charcoal">
-                    Shop the Look
-                  </span>
-                </span>
-              </LinkButton>
-            </RevealItem>
-          ))}
+              </RevealItem>
+            );
+          })}
         </RevealGroup>
 
-        <Reveal className="mt-20">
+        <Reveal className="mt-20 lg:mt-28">
           <SectionHeading
             eyebrow="The Archive"
             title="Past Edits, Still Timeless"
             align="center"
           />
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {collections.map((c) => (
-              <LinkButton
-                key={c.id}
-                href={`/collections/${c.id}`}
-                variant="ghost"
-                className="group relative block overflow-hidden p-0"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <span className="absolute inset-0 bg-charcoal/35 transition-colors group-hover:bg-charcoal/25" />
-                <span className="type-heading-md absolute inset-x-4 bottom-4 text-ivory">
-                  {c.name}
-                </span>
-              </LinkButton>
+              <CollectionCard key={c.id} collection={c} aspect="aspect-[3/4]" />
             ))}
           </div>
         </Reveal>

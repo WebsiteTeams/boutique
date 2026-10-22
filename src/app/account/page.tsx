@@ -2,7 +2,6 @@
 
 import {
   BadgeCheck,
-  CalendarDays,
   Heart,
   LogOut,
   MapPin,
@@ -19,7 +18,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import type {
-  Appointment,
   LoyaltySummary,
   MeasurementProfile,
   Order,
@@ -28,8 +26,6 @@ import type {
   SavedDesign,
 } from "@/types";
 import { api, errorMessage } from "@/lib/api";
-import { blouseOptionName } from "@/lib/blouse";
-import { customizationGroups } from "@/lib/data";
 import { useApi } from "@/lib/use-api";
 import { useAuth, useToast, useWishlist } from "@/context/store";
 import { cn, formatDate, formatINR, getInitials } from "@/lib/utils";
@@ -46,7 +42,6 @@ interface Overview {
   addresses: SavedAddress[];
   measurements: MeasurementProfile[];
   designs: SavedDesign[];
-  appointments: Appointment[];
   reviews: ProductReview[];
   loyalty: LoyaltySummary | null;
 }
@@ -57,7 +52,6 @@ const TABS = [
   { id: "addresses", label: "Addresses", icon: MapPin },
   { id: "measurements", label: "Measurements", icon: Ruler },
   { id: "designs", label: "Saved Designs", icon: Scissors },
-  { id: "appointments", label: "Appointments", icon: CalendarDays },
   { id: "reviews", label: "Reviews", icon: Star },
   { id: "profile", label: "Profile", icon: BadgeCheck },
 ] as const;
@@ -130,7 +124,7 @@ function AccountInner() {
     );
   }
 
-  const { orders, addresses, measurements, designs, appointments, reviews, loyalty } = data;
+  const { orders, addresses, measurements, designs, reviews, loyalty } = data;
   const spend = orders.filter((o) => !NON_REVENUE.includes(o.status)).reduce((s, o) => s + o.total, 0);
 
   const deleteDesign = async (design: SavedDesign) => {
@@ -192,7 +186,7 @@ function AccountInner() {
       </div>
 
       {tab === "overview" && (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <button onClick={() => setTab("orders")} className="rounded-2xl border border-clay/60 bg-white/60 p-6 text-left transition-colors hover:border-charcoal/40">
             <PackageCheck width={22} height={22} className="text-gold-deep" />
             <p className="type-heading-lg mt-3 text-charcoal">{orders.length}</p>
@@ -208,16 +202,8 @@ function AccountInner() {
             <p className="type-heading-lg mt-3 text-charcoal">{formatINR(spend)}</p>
             <p className="text-sm text-mist">Lifetime spend</p>
           </div>
-          <button onClick={() => setTab("appointments")} className="rounded-2xl border border-clay/60 bg-white/60 p-6 text-left transition-colors hover:border-charcoal/40">
-            <CalendarDays width={22} height={22} className="text-gold-deep" />
-            <p className="type-heading-lg mt-3 text-charcoal">
-              {appointments.filter((a) => ["Pending", "Confirmed", "Rescheduled"].includes(a.status)).length}
-            </p>
-            <p className="text-sm text-mist">Upcoming appointments</p>
-          </button>
-
           {loyalty && (
-            <div className="rounded-2xl border border-gold/40 bg-cream/60 p-6 sm:col-span-2 lg:col-span-4">
+            <div className="rounded-2xl border border-gold/40 bg-cream/60 p-6 sm:col-span-2 lg:col-span-3">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="eyebrow flex items-center gap-2 text-gold-deep">
@@ -354,13 +340,13 @@ function AccountInner() {
                     <h3 className="font-medium text-charcoal">{d.name}</h3>
                     <p className="text-xs text-mist">Saved {formatDate(d.createdAt)}</p>
                   </div>
-                  <span className="type-price tabular-nums text-charcoal">{formatINR(d.price)}</span>
+                  <span className="type-price tabular-nums text-charcoal">{d.price === null ? "Needs updating" : formatINR(d.price)}</span>
                 </div>
                 <dl className="mt-4 space-y-1.5 text-sm">
-                  {customizationGroups.map((g) => (
-                    <div key={g.id} className="flex justify-between gap-2">
-                      <dt className="text-mist">{g.label}</dt>
-                      <dd className="text-charcoal">{blouseOptionName(g.id, d.options[g.id])}</dd>
+                  {d.rows.map((row) => (
+                    <div key={row.label} className="flex justify-between gap-2">
+                      <dt className="text-mist">{row.label}</dt>
+                      <dd className="text-right text-charcoal">{row.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -377,43 +363,6 @@ function AccountInner() {
             ))}
           </ul>
         ))}
-
-      {tab === "appointments" && (
-        <div>
-          {appointments.length === 0 ? (
-            <div className="rounded-2xl border border-clay/60 bg-white/60">
-              <EmptyState
-                icon={<CalendarDays width={24} height={24} />}
-                title="No appointments"
-                description="Book a private boutique visit for bridal, blouse or saree consultations."
-                actionLabel="Book an Appointment"
-                href="/appointments"
-              />
-            </div>
-          ) : (
-            <>
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {appointments.map((a) => (
-                  <li key={a.id} className="rounded-2xl border border-clay/60 bg-white/60 p-6">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium text-charcoal">{a.id}</span>
-                      <StatusBadge status={a.status} />
-                    </div>
-                    <p className="mt-3 type-heading-md text-charcoal">{a.purpose}</p>
-                    <p className="mt-1 text-sm text-mist">
-                      {formatDate(a.date)} at {a.time}
-                    </p>
-                    {a.notes && <p className="mt-2 text-sm italic text-mist">“{a.notes}”</p>}
-                  </li>
-                ))}
-              </ul>
-              <LinkButton href="/appointments" variant="outline" size="sm" className="mt-6">
-                Book Another Appointment
-              </LinkButton>
-            </>
-          )}
-        </div>
-      )}
 
       {tab === "reviews" &&
         (reviews.length === 0 ? (

@@ -7,8 +7,10 @@ import { SESSION_COOKIE } from "@/server/auth/constants";
  * and API route re-checks the session (and the admin role) on the server.
  */
 export function proxy(request: NextRequest) {
-  if (request.cookies.has(SESSION_COOKIE)) return NextResponse.next();
-  const login = new URL("/login", request.url);
+  const { pathname } = request.nextUrl;
+  if (pathname === "/admin/login" || request.cookies.has(SESSION_COOKIE)) return NextResponse.next();
+  // Staff areas use the separate admin sign-in page.
+  const login = new URL(pathname.startsWith("/admin") ? "/admin/login" : "/login", request.url);
   login.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
   return NextResponse.redirect(login);
 }

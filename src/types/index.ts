@@ -104,7 +104,13 @@ export interface CustomizationSummary {
   instructions?: string;
   /** URL of the uploaded reference image. */
   referenceImage?: string;
+  /** Chosen base design, when the boutique offers designs. */
+  designId?: string;
+  design?: string;
+  /** Line total for one blouse (whole rupees). Named for backwards compatibility with stored carts. */
   basePrice: number;
+  /** Itemised price snapshot taken when the blouse was priced. */
+  pricing?: import("@/lib/blouse-pricing").PriceBreakdown;
 }
 
 export interface CategoryItem {
@@ -191,7 +197,9 @@ export interface SavedDesign {
   id: string;
   name: string;
   options: Record<string, string>;
-  price: number;
+  /** Current price, or null when an option in it is no longer offered. */
+  price: number | null;
+  rows: { label: string; value: string }[];
   createdAt: string;
 }
 
@@ -233,20 +241,6 @@ export interface Order {
   estimatedDelivery: string;
   customer?: { id: string; name: string; email: string };
   internalNotes?: { note: string; at: string; by: string }[];
-}
-
-export interface Appointment {
-  id: string;
-  purpose: string;
-  date: string;
-  time: string;
-  name: string;
-  phone: string;
-  email: string;
-  notes: string;
-  status: string;
-  adminNotes?: string;
-  createdAt: string;
 }
 
 export interface SessionUser {

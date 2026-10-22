@@ -10,47 +10,22 @@ const PERKS: Perk[] = [
   { icon: ShieldCheck, title: "Secure Payments", text: "UPI, cards, net banking & COD" },
 ];
 
-function PerkItem({ perk }: { perk: Perk }) {
-  return (
-    <div className="flex items-center gap-3.5">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-clay bg-cream/60 text-gold-deep">
-        <perk.icon width={19} height={19} strokeWidth={1.5} />
-      </span>
-      <div>
-        <p className="whitespace-nowrap text-sm font-medium text-charcoal">{perk.title}</p>
-        <p className="whitespace-nowrap text-xs text-mist">{perk.text}</p>
-      </div>
-    </div>
-  );
-}
-
-function PerkGroup({ hidden }: { hidden?: boolean }) {
-  return (
-    <div
-      aria-hidden={hidden || undefined}
-      className="flex shrink-0 items-center gap-10 pr-10"
-    >
-      {PERKS.map((perk) => (
-        <PerkItem key={perk.title} perk={perk} />
-      ))}
-    </div>
-  );
-}
-
 export function ServicePerks() {
   return (
-    <section className="border-y border-clay/50 bg-ivory">
-      <div className="overflow-hidden py-8 md:hidden">
-        <div className="flex w-max animate-marquee">
-          <PerkGroup />
-          <PerkGroup hidden />
-        </div>
-      </div>
-      <div className="mx-auto hidden max-w-[1440px] grid-cols-2 gap-x-4 gap-y-8 px-5 py-10 sm:px-8 md:grid lg:grid-cols-4 lg:px-10 lg:py-12">
+    <section className="border-y border-clay/50 bg-ivory" aria-label="Why shop with UMA">
+      <ul className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-4 gap-y-6 px-5 py-8 sm:gap-x-6 sm:px-8 md:py-10 lg:grid-cols-4 lg:px-10 lg:py-12">
         {PERKS.map((perk) => (
-          <PerkItem key={perk.title} perk={perk} />
+          <li key={perk.title} className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-3.5">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay bg-cream/60 text-gold-deep sm:h-11 sm:w-11">
+              <perk.icon width={18} height={18} strokeWidth={1.5} aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-charcoal">{perk.title}</p>
+              <p className="text-xs leading-snug text-mist">{perk.text}</p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

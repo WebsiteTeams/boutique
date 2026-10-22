@@ -1,11 +1,9 @@
 import { createHash } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { eq, lt } from "drizzle-orm";
 import type { SessionUser } from "@/types";
 import { env } from "@/server/config/env";
-import { db } from "@/server/db/client";
-import { sessions, users } from "@/server/db/schema";
+import { plain, Sessions, Users, type UserRow } from "@/server/db/models";
 import { forbidden, unauthorized } from "@/server/utils/errors";
 import { now, randomToken } from "@/server/utils/ids";
 import { SESSION_COOKIE } from "./constants";
@@ -15,7 +13,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
-export function toSessionUser(row: typeof users.$inferSelect): SessionUser {
+export function toSessionUser(row: UserRow): SessionUser {
   return {
     id: row.id,
     name: row.name,
@@ -30,12 +28,7 @@ export function toSessionUser(row: typeof users.$inferSelect): SessionUser {
 export async function createSession(userId: string) {
   const token = randomToken();
   const expires = new Date(Date.now() + SESSION_DAYS * DAY_MS);
-  await db.insert(sessions).values({
-    id: hashToken(token),
-    userId,
-    expiresAt: expires.toISOString(),
-    createdAt: now(),
-  });
+  await Sessions.create({ _id: hashToken(token), userId, expiresAt: expires.toISOString(), createdAt: now() });
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: env.isProduction,
@@ -44,13 +37,13 @@ export async function createSession(userId: string) {
     expires,
   });
   // Opportunistic cleanup of expired sessions.
-  await db.delete(sessions).where(lt(sessions.expiresAt, now()));
+  await Sessions.deleteMany({ expiresAt: { $lt: now() } });
 }
 
 export async function destroySession() {
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
-  if (token) await db.delete(sessions).where(eq(sessions.id, hashToken(token)));
+  if (token) await Sessions.deleteOne({ _id: hashToken(token) });
   store.delete(SESSION_COOKIE);
 }
 
@@ -58,14 +51,10 @@ export async function destroySession() {
 export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const [row] = await db
-    .select({ user: users, expiresAt: sessions.expiresAt })
-    .from(sessions)
-    .innerJoin(users, eq(users.id, sessions.userId))
-    .where(eq(sessions.id, hashToken(token)))
-    .limit(1);
-  if (!row || row.expiresAt <= now()) return null;
-  return toSessionUser(row.user);
+  const session = await Sessions.findById(hashToken(token)).lean();
+  if (!session || session.expiresAt <= now()) return null;
+  const user = plain<UserRow>(await Users.findById(session.userId).lean());
+  return user ? toSessionUser(user) : null;
 });
 
 export async function requireUser(): Promise<SessionUser> {

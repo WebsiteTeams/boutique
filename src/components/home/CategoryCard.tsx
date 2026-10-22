@@ -22,20 +22,20 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
     >
       <Link
         href={category.href}
-        className="relative block h-full w-full overflow-hidden"
-        aria-label={category.name}
+        className="relative block h-full w-full overflow-hidden outline-offset-4 focus-visible:outline-2 focus-visible:outline-gold"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={category.image}
-          alt={category.name}
+          alt=""
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-luxe motion-safe:group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent transition-colors duration-500 group-hover:from-ink/90" />
+        <div className="absolute inset-0 bg-ink/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/60 via-50% to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
-          <p className="eyebrow mb-3 flex items-center gap-3 text-gold-soft">
+          <p className="eyebrow mb-3 flex items-center gap-3 text-ivory/85">
             <span className="h-px w-8 bg-gold-soft/70" />
             {category.name}
           </p>

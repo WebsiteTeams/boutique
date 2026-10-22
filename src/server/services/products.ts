@@ -1,15 +1,14 @@
-import { and, asc, desc, eq, gte, inArray, like, lte, ne, or, sql, type SQL } from "drizzle-orm";
 import type { z } from "zod";
 import type { BadgeType, Product } from "@/types";
 import { stockState } from "@/lib/status";
 import { slugify } from "@/lib/utils";
-import { db } from "@/server/db/client";
-import { products } from "@/server/db/schema";
+import type { SortOrder } from "mongoose";
+import { productFromDoc, productToDoc, Products, Reviews, WishlistItems, type ProductRow } from "@/server/db/models";
 import { conflict, notFound } from "@/server/utils/errors";
 import { newId, now } from "@/server/utils/ids";
 import type { productSchema } from "@/server/validators";
 
-export type ProductRow = typeof products.$inferSelect;
+export type { ProductRow };
 export type ProductInput = z.infer<typeof productSchema>;
 
 function badgeFor(row: ProductRow): BadgeType | undefined {
@@ -91,50 +90,48 @@ const intersects = (haystack: string[], needles: string[]) => {
   return needles.some((n) => set.has(n));
 };
 
+const escapeRegex = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export async function listProductRows(filters: ProductFilters = {}): Promise<ProductRow[]> {
-  const where: (SQL | undefined)[] = [];
-  if (!filters.includeInactive) where.push(eq(products.isActive, true));
-  if (filters.category) where.push(eq(products.category, filters.category as ProductRow["category"]));
-  if (filters.subcategory?.length) where.push(inArray(products.subcategory, filters.subcategory));
-  if (filters.pattern?.length) where.push(inArray(products.pattern, filters.pattern));
-  if (filters.minPrice != null) where.push(gte(products.price, filters.minPrice));
-  if (filters.maxPrice != null) where.push(lte(products.price, filters.maxPrice));
-  if (filters.isNew) where.push(eq(products.isNew, true));
-  if (filters.isBestseller) where.push(eq(products.isBestseller, true));
-  if (filters.isFeatured) where.push(eq(products.isFeatured, true));
+  const where: Record<string, unknown> = {};
+  if (!filters.includeInactive) where.isActive = true;
+  if (filters.category) where.category = filters.category as ProductRow["category"];
+  if (filters.subcategory?.length) where.subcategory = { $in: filters.subcategory };
+  if (filters.pattern?.length) where.pattern = { $in: filters.pattern };
+  if (filters.minPrice != null || filters.maxPrice != null) {
+    where.price = {
+      ...(filters.minPrice != null ? { $gte: filters.minPrice } : {}),
+      ...(filters.maxPrice != null ? { $lte: filters.maxPrice } : {}),
+    };
+  }
+  if (filters.isNew) where.isNewArrival = true;
+  if (filters.isBestseller) where.isBestseller = true;
+  if (filters.isFeatured) where.isFeatured = true;
   if (filters.ids) {
     if (filters.ids.length === 0) return [];
-    where.push(inArray(products.id, filters.ids));
+    where._id = { $in: filters.ids };
   }
-  const q = filters.search?.trim().toLowerCase();
+  const q = filters.search?.trim();
   if (q) {
-    const term = `%${q.replace(/[%_]/g, "")}%`;
-    where.push(
-      or(
-        like(sql`lower(${products.name})`, term),
-        like(sql`lower(${products.fabric})`, term),
-        like(sql`lower(${products.color})`, term),
-        like(sql`lower(${products.category})`, term),
-        like(sql`lower(${products.subcategory})`, term),
-        like(sql`lower(${products.sku})`, term),
-        like(sql`lower(${products.tags})`, term),
-        like(sql`lower(${products.occasions})`, term)
-      )
-    );
+    // Case-insensitive "contains" over the same fields the SQL version searched; user text is escaped.
+    const term = new RegExp(escapeRegex(q), "i");
+    where.$or = ["name", "fabric", "color", "category", "subcategory", "sku", "tags", "occasions"].map((field) => ({
+      [field]: term,
+    }));
   }
 
-  const order =
+  const order: Record<string, SortOrder> =
     filters.sort === "price-asc"
-      ? [asc(products.price)]
+      ? { price: 1 }
       : filters.sort === "price-desc"
-        ? [desc(products.price)]
+        ? { price: -1 }
         : filters.sort === "popular"
-          ? [desc(products.soldCount), desc(products.reviewCount), desc(products.isBestseller)]
-          : [desc(products.isNew), desc(products.createdAt)];
+          ? { soldCount: -1, reviewCount: -1, isBestseller: -1 }
+          : { isNewArrival: -1, createdAt: -1 };
 
-  let rows = await db.select().from(products).where(and(...where)).orderBy(...order, asc(products.id));
+  let rows = (await Products.find(where).sort({ ...order, _id: 1 }).lean()).map((d: unknown) => productFromDoc(d));
 
-  // List-valued attributes are stored as JSON, so they are matched in memory.
+  // Case-insensitive list matching is done in memory, as before.
   const colors = lower(filters.color);
   const fabrics = lower(filters.fabric);
   const occasions = lower(filters.occasion);
@@ -161,7 +158,7 @@ export const listProducts = async (filters: ProductFilters = {}) =>
   (await listProductRows(filters)).map(toProduct);
 
 export async function getProductRowBySlug(slug: string, includeInactive = false) {
-  const [row] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+  const row = productFromDoc(await Products.findOne({ slug }).lean());
   if (!row || (!row.isActive && !includeInactive)) return null;
   return row;
 }
@@ -172,8 +169,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 }
 
 export async function getProductRowById(id: string) {
-  const [row] = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  return row ?? null;
+  return productFromDoc(await Products.findById(id).lean());
 }
 
 /** Returns products in the same order as `ids`, skipping unknown / inactive ones. */
@@ -267,22 +263,14 @@ async function uniqueSlug(base: string, excludeId?: string) {
   const root = slugify(base) || "product";
   for (let i = 0; i < 50; i += 1) {
     const candidate = i === 0 ? root : `${root}-${i + 1}`;
-    const [clash] = await db
-      .select({ id: products.id })
-      .from(products)
-      .where(and(eq(products.slug, candidate), excludeId ? ne(products.id, excludeId) : undefined))
-      .limit(1);
+    const clash = await Products.exists({ slug: candidate, ...(excludeId ? { _id: { $ne: excludeId } } : {}) });
     if (!clash) return candidate;
   }
   return `${root}-${Date.now()}`;
 }
 
 async function assertSlugFree(slug: string, excludeId?: string) {
-  const [clash] = await db
-    .select({ id: products.id })
-    .from(products)
-    .where(and(eq(products.slug, slug), excludeId ? ne(products.id, excludeId) : undefined))
-    .limit(1);
+  const clash = await Products.exists({ slug, ...(excludeId ? { _id: { $ne: excludeId } } : {}) });
   if (clash) throw conflict("Another product already uses this URL slug.");
 }
 
@@ -326,11 +314,8 @@ export async function createProduct(input: ProductInput): Promise<Product> {
     slug = await uniqueSlug(input.name);
   }
   const timestamp = now();
-  const [row] = await db
-    .insert(products)
-    .values({ id: newId("pr"), slug, ...columnsFrom(input), createdAt: timestamp, updatedAt: timestamp })
-    .returning();
-  return toProduct(row);
+  const doc = await Products.create({ _id: newId("pr"), slug, ...productToDoc(columnsFrom(input)), createdAt: timestamp, updatedAt: timestamp });
+  return toProduct(productFromDoc(doc.toObject()));
 }
 
 export async function updateProduct(id: string, input: ProductInput): Promise<Product> {
@@ -341,30 +326,29 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Pr
     await assertSlugFree(input.slug, id);
     slug = input.slug;
   }
-  const [row] = await db
-    .update(products)
-    .set({ slug, ...columnsFrom(input), updatedAt: now() })
-    .where(eq(products.id, id))
-    .returning();
-  return toProduct(row);
+  const doc = await Products.findOneAndUpdate(
+    { _id: id },
+    { $set: { slug, ...productToDoc(columnsFrom(input)), updatedAt: now() } },
+    { new: true }
+  ).lean();
+  if (!doc) throw notFound("Product not found.");
+  return toProduct(productFromDoc(doc));
 }
 
 export async function deleteProduct(id: string) {
-  const deleted = await db.delete(products).where(eq(products.id, id)).returning({ id: products.id });
-  if (deleted.length === 0) throw notFound("Product not found.");
+  const res = await Products.deleteOne({ _id: id });
+  if (res.deletedCount === 0) throw notFound("Product not found.");
+  // The SQL schema cascaded these; MongoDB has no foreign keys, so remove them explicitly.
+  await Promise.all([WishlistItems.deleteMany({ productId: id }), Reviews.deleteMany({ productId: id })]);
 }
 
 /** Sets an absolute stock level or applies a relative adjustment (e.g. an in-store sale). */
 export async function updateStock(id: string, change: { stock?: number; adjust?: number }): Promise<Product> {
-  const set =
+  const update =
     change.stock != null
-      ? { stock: change.stock }
-      : { stock: sql`max(0, ${products.stock} + ${change.adjust ?? 0})` };
-  const [row] = await db
-    .update(products)
-    .set({ ...set, updatedAt: now() })
-    .where(eq(products.id, id))
-    .returning();
-  if (!row) throw notFound("Product not found.");
-  return toProduct(row);
+      ? { $set: { stock: change.stock, updatedAt: now() } }
+      : [{ $set: { stock: { $max: [0, { $add: ["$stock", change.adjust ?? 0] }] }, updatedAt: now() } }];
+  const doc = await Products.findOneAndUpdate({ _id: id }, update, { new: true, updatePipeline: Array.isArray(update) }).lean();
+  if (!doc) throw notFound("Product not found.");
+  return toProduct(productFromDoc(doc));
 }

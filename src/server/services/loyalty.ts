@@ -1,8 +1,6 @@
-import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import type { LoyaltySummary } from "@/types";
-import { db, type Database } from "@/server/db/client";
-import { settings, users } from "@/server/db/schema";
+import { Settings, Users } from "@/server/db/models";
 import { now } from "@/server/utils/ids";
 import type { loyaltySettingsSchema } from "@/server/validators";
 
@@ -17,21 +15,18 @@ export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
   tiers: [
     { name: "Silver", minPoints: 0, perk: "Early access to new collections" },
     { name: "Gold", minPoints: 500, perk: "Priority tailoring slots and festive previews" },
-    { name: "VIP", minPoints: 1500, perk: "Personal stylist and private boutique appointments" },
+    { name: "VIP", minPoints: 1500, perk: "Personal stylist and private boutique visits" },
   ],
 };
 
 export async function getLoyaltySettings(): Promise<LoyaltySettings> {
-  const [row] = await db.select().from(settings).where(eq(settings.key, SETTINGS_KEY)).limit(1);
+  const row = await Settings.findById(SETTINGS_KEY).lean();
   const value = (row?.value as LoyaltySettings | undefined) ?? DEFAULT_LOYALTY_SETTINGS;
   return { ...value, tiers: [...value.tiers].sort((a, b) => a.minPoints - b.minPoints) };
 }
 
 export async function saveLoyaltySettings(value: LoyaltySettings) {
-  await db
-    .insert(settings)
-    .values({ key: SETTINGS_KEY, value, updatedAt: now() })
-    .onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: now() } });
+  await Settings.updateOne({ _id: SETTINGS_KEY }, { $set: { value, updatedAt: now() } }, { upsert: true });
   return getLoyaltySettings();
 }
 
@@ -56,14 +51,14 @@ export function summariseLoyalty(points: number, config: LoyaltySettings): Loyal
 export async function getLoyaltySummary(userId: string): Promise<LoyaltySummary | null> {
   const config = await getLoyaltySettings();
   if (!config.enabled) return null;
-  const [row] = await db.select({ points: users.loyaltyPoints }).from(users).where(eq(users.id, userId)).limit(1);
-  return summariseLoyalty(row?.points ?? 0, config);
+  const row = await Users.findById(userId, { loyaltyPoints: 1 }).lean();
+  return summariseLoyalty(row?.loyaltyPoints ?? 0, config);
 }
 
-export async function adjustPoints(tx: Pick<Database, "update">, userId: string, delta: number) {
+/** Adds (or removes) points atomically, never going below zero. */
+export async function adjustPoints(userId: string, delta: number) {
   if (delta === 0) return;
-  await tx
-    .update(users)
-    .set({ loyaltyPoints: sql`max(0, ${users.loyaltyPoints} + ${delta})` })
-    .where(eq(users.id, userId));
+  await Users.updateOne({ _id: userId }, [{ $set: { loyaltyPoints: { $max: [0, { $add: ["$loyaltyPoints", delta] }] } } }], {
+    updatePipeline: true,
+  });
 }

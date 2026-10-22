@@ -1,7 +1,14 @@
+import { pageMetadata } from "@/lib/seo";
 import { Package, RefreshCcw, ShieldCheck, Truck } from "lucide-react";
 import { InfoPage } from "@/components/ui/InfoPage";
 import { FREE_DELIVERY_THRESHOLD, SHIPPING_FEE } from "@/lib/pricing";
 import { formatINR } from "@/lib/utils";
+
+export const metadata = pageMetadata({
+  title: "Shipping Information",
+  description: "Delivery times, charges and dispatch details for UMA Designers orders across India.",
+  path: "/shipping",
+});
 
 const FEATURES = [
   {

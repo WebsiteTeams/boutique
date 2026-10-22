@@ -63,12 +63,13 @@ export function Hero() {
       </motion.div>
 
       {/* Legibility scrims */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/25 to-transparent" />
+      <div className="absolute inset-0 hidden bg-gradient-to-r from-ink/85 via-ink/25 to-transparent sm:block" />
       <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-ink/60 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
+      {/* Phones: copy sits in the lower third, so the scrim is taller and deeper there. */}
+      <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink via-ink/75 to-transparent sm:h-64 sm:from-ink/85 sm:via-ink/20" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-5 pb-16 pt-28 sm:px-8 sm:pb-24 sm:pt-32 lg:px-10 lg:pb-32">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-5 pb-10 pt-28 sm:px-8 sm:pb-24 sm:pt-32 lg:px-10 lg:pb-32">
         <motion.div
           variants={container}
           initial="hidden"
@@ -77,13 +78,13 @@ export function Hero() {
         >
           <motion.p
             variants={fadeUp}
-            className="eyebrow mb-5 flex items-center gap-3 text-gold-soft sm:mb-6"
+            className="eyebrow mb-4 flex items-center gap-3 text-gold-soft sm:mb-6"
           >
             <span className="h-px w-10 bg-gold-soft/70" />
             The New Collection
           </motion.p>
 
-          <h1 className="serif-display text-[2.6rem] leading-[1.02] text-ivory sm:text-[3.4rem] md:text-[4.25rem] lg:text-[5rem] xl:text-[5.75rem]">
+          <h1 className="serif-display text-[2.4rem] leading-[1.02] text-ivory min-[380px]:text-[2.6rem] sm:text-[3.4rem] md:text-[4.25rem] lg:text-[5rem] xl:text-[5.75rem]">
             <RevealLine>Draped in</RevealLine>
             <RevealLine>
               <em className="italic text-gold-soft">Elegance.</em>
@@ -92,32 +93,34 @@ export function Hero() {
 
           <motion.p
             variants={fadeUp}
-            className="serif-display mt-5 text-[1.2rem] italic text-ivory/90 sm:mt-6 sm:text-[1.5rem] md:text-[1.75rem]"
+            className="serif-display mt-3 text-[1.15rem] italic text-ivory/90 sm:mt-6 sm:text-[1.5rem] md:text-[1.75rem]"
           >
             Made for Every Moment.
           </motion.p>
 
           <motion.p
             variants={fadeUp}
-            className="mt-4 max-w-md type-body text-ivory/75 sm:mt-5"
+            className="mt-4 hidden max-w-md type-body text-ivory/80 sm:mt-5 sm:block"
           >
             Discover timeless sarees and handcrafted pieces designed for the
             modern Indian woman.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center sm:gap-4">
+          <motion.div variants={fadeUp} className="mt-7 grid grid-cols-2 gap-3 sm:mt-10 sm:flex sm:items-center sm:gap-4">
             <Link
               href="/sarees"
-              className="type-btn inline-flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ivory px-7 text-charcoal transition-all duration-300 hover:bg-white hover:shadow-lifted active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
+              className="type-btn inline-flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ivory px-4 text-charcoal transition-all duration-300 hover:bg-white hover:shadow-lifted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-soft active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
             >
               Shop Sarees
             </Link>
             <Link
               href="/collections"
-              className="type-btn group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ivory/40 px-7 text-ivory transition-all duration-300 hover:border-ivory hover:bg-ivory/10 active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
+              className="type-btn group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ivory/50 px-4 text-ivory transition-all duration-300 hover:border-ivory hover:bg-ivory/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-soft active:scale-[0.98] sm:h-14 sm:w-auto sm:px-9"
             >
-              Explore Collection
+              <span className="sm:hidden">Collections</span>
+              <span className="hidden sm:inline">Explore Collection</span>
               <ArrowRight
+                aria-hidden
                 width={15}
                 height={15}
                 className="transition-transform duration-300 group-hover:translate-x-1"

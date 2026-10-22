@@ -12,12 +12,19 @@ export const env = {
   get isProduction() {
     return process.env.NODE_ENV === "production";
   },
-  /** libSQL URL: `file:./data/uma.db` locally, `libsql://…` for a hosted database. */
-  get databaseUrl() {
-    return read("DATABASE_URL") ?? "file:./data/uma.db";
+  /**
+   * The seeded admin login from .env.local, shown on /admin/login as a convenience
+   * during local development only. Always null in production.
+   */
+  get devAdminLogin(): { email: string; password: string } | null {
+    if (process.env.NODE_ENV === "production") return null;
+    const email = read("ADMIN_EMAIL");
+    const password = read("ADMIN_PASSWORD");
+    return email && password ? { email, password } : null;
   },
-  get databaseAuthToken() {
-    return read("DATABASE_AUTH_TOKEN");
+  /** MongoDB connection string, e.g. mongodb://127.0.0.1:27017/uma_designers or a mongodb+srv:// Atlas URI. */
+  get mongodbUri() {
+    return read("MONGODB_URI") ?? "mongodb://127.0.0.1:27017/uma_designers";
   },
   get razorpayKeyId() {
     return read("RAZORPAY_KEY_ID");

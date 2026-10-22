@@ -1,23 +1,26 @@
-import { and, asc, eq, gte, inArray, notInArray, sql } from "drizzle-orm";
 import type { CollectionItem } from "@/types";
 import { LOW_STOCK_THRESHOLD } from "@/lib/status";
-import { db } from "@/server/db/client";
 import {
-  appointments,
-  collections,
-  contactMessages,
-  customBlouses,
-  orders,
-  products,
-  reviews,
-  users,
-} from "@/server/db/schema";
+  Collections,
+  ContactMessages,
+  CustomBlouses,
+  Orders,
+  Products,
+  Reviews,
+  Users,
+} from "@/server/db/models";
 
 const NON_REVENUE = ["Cancelled", "Refunded", "Returned"];
 const CLOSED = ["Delivered", ...NON_REVENUE];
 
-const count = sql<number>`count(*)`;
-const revenue = sql<number>`coalesce(sum(${orders.total}), 0)`;
+/** Revenue and order count for orders matching a filter. */
+async function revenueOf(match: Record<string, unknown>) {
+  const [row] = await Orders.aggregate<{ revenue: number; count: number }>([
+    { $match: match },
+    { $group: { _id: null, revenue: { $sum: "$total" }, count: { $sum: 1 } } },
+  ]);
+  return { revenue: row?.revenue ?? 0, count: row?.count ?? 0 };
+}
 
 /** Start of the given day (local server time) as an ISO string. */
 function startOfDay(offsetDays = 0) {
@@ -34,8 +37,6 @@ export interface DashboardStats {
   todayOrders: number;
   pendingOrders: number;
   customOrdersOpen: number;
-  upcomingAppointments: number;
-  pendingAppointments: number;
   lowStock: number;
   outOfStock: number;
   customers: number;
@@ -47,57 +48,28 @@ export interface DashboardStats {
 /** Every figure on the admin dashboard is computed from live database rows. */
 export async function getDashboardStats(): Promise<DashboardStats> {
   const today = startOfDay();
-  const billable = notInArray(orders.status, NON_REVENUE);
-  const todayDate = new Date().toISOString().slice(0, 10);
+  const billable = { status: { $nin: NON_REVENUE } };
 
-  const [
-    [all],
-    [todayRow],
-    [pending],
-    [customOpen],
-    [upcoming],
-    [pendingAppts],
-    [low],
-    [out],
-    [customerCount],
-    [pendingReviews],
-    [newMessages],
-    monthly,
-  ] = await Promise.all([
-    db.select({ revenue, count }).from(orders).where(billable),
-    db.select({ revenue, count }).from(orders).where(and(billable, gte(orders.createdAt, today))),
-    db.select({ count }).from(orders).where(notInArray(orders.status, CLOSED)),
-    db.select({ count }).from(customBlouses).where(notInArray(customBlouses.status, ["Delivered", "Cancelled"])),
-    db
-      .select({ count })
-      .from(appointments)
-      .where(and(gte(appointments.date, todayDate), inArray(appointments.status, ["Pending", "Confirmed", "Rescheduled"]))),
-    db.select({ count }).from(appointments).where(eq(appointments.status, "Pending")),
-    db
-      .select({ count })
-      .from(products)
-      .where(
-        and(
-          eq(products.isActive, true),
-          eq(products.deliveryType, "ready"),
-          sql`${products.stock} > 0 and ${products.stock} <= ${LOW_STOCK_THRESHOLD}`
-        )
-      ),
-    db
-      .select({ count })
-      .from(products)
-      .where(and(eq(products.isActive, true), eq(products.deliveryType, "ready"), eq(products.stock, 0))),
-    db.select({ count }).from(users).where(eq(users.role, "customer")),
-    db.select({ count }).from(reviews).where(eq(reviews.status, "Pending")),
-    db.select({ count }).from(contactMessages).where(eq(contactMessages.status, "New")),
-    db
-      .select({ month: sql<string>`substr(${orders.createdAt}, 1, 7)`, revenue, count })
-      .from(orders)
-      .where(billable)
-      .groupBy(sql`substr(${orders.createdAt}, 1, 7)`),
-  ]);
+  const [all, todayRow, pending, customOpen, low, out, customerCount, pendingReviews, newMessages, monthly] =
+    await Promise.all([
+      revenueOf(billable),
+      revenueOf({ ...billable, createdAt: { $gte: today } }),
+      Orders.countDocuments({ status: { $nin: CLOSED } }),
+      CustomBlouses.countDocuments({ status: { $nin: ["Delivered", "Cancelled"] } }),
+      Products.countDocuments({ isActive: true, deliveryType: "ready", stock: { $gt: 0, $lte: LOW_STOCK_THRESHOLD } }),
+      Products.countDocuments({ isActive: true, deliveryType: "ready", stock: 0 }),
+      Users.countDocuments({ role: "customer" }),
+      Reviews.countDocuments({ status: "Pending" }),
+      ContactMessages.countDocuments({ status: "New" }),
+      Orders.aggregate<{ _id: string; revenue: number; count: number }>([
+        { $match: billable },
+        // createdAt is an ISO string, so its first 7 characters are the YYYY-MM month.
+        { $group: { _id: { $substrBytes: ["$createdAt", 0, 7] }, revenue: { $sum: "$total" }, count: { $sum: 1 } } },
+      ]),
+    ]);
 
-  const byMonth = new Map(monthly.map((m) => [m.month, m]));
+  const monthRows = monthly.map((m) => ({ month: m._id, revenue: m.revenue, count: m.count }));
+  const byMonth = new Map(monthRows.map((m) => [m.month, m]));
   const revenueByMonth = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(1);
@@ -117,15 +89,13 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     totalRevenue: all.revenue,
     totalOrders: all.count,
     todayOrders: todayRow.count,
-    pendingOrders: pending.count,
-    customOrdersOpen: customOpen.count,
-    upcomingAppointments: upcoming.count,
-    pendingAppointments: pendingAppts.count,
-    lowStock: low.count,
-    outOfStock: out.count,
-    customers: customerCount.count,
-    pendingReviews: pendingReviews.count,
-    newMessages: newMessages.count,
+    pendingOrders: pending,
+    customOrdersOpen: customOpen,
+    lowStock: low,
+    outOfStock: out,
+    customers: customerCount,
+    pendingReviews,
+    newMessages,
     revenueByMonth,
   };
 }
@@ -133,13 +103,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 /* ---------------- Collections ---------------- */
 
 export async function listCollections(includeInactive = false): Promise<CollectionItem[]> {
-  const rows = await db
-    .select()
-    .from(collections)
-    .where(includeInactive ? undefined : eq(collections.isActive, true))
-    .orderBy(asc(collections.sortOrder), asc(collections.name));
+  const rows = await Collections.find(includeInactive ? {} : { isActive: true }).sort({ sortOrder: 1, name: 1 }).lean();
   return rows.map((r) => ({
-    id: r.id,
+    id: r._id,
     name: r.name,
     tagline: r.tagline,
     description: r.description,

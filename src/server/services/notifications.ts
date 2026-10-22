@@ -1,8 +1,6 @@
-import { desc, eq } from "drizzle-orm";
 import { siteConfig } from "@/lib/config";
 import { env } from "@/server/config/env";
-import { db } from "@/server/db/client";
-import { notifications } from "@/server/db/schema";
+import { Notifications, plainAll, type NotificationRow } from "@/server/db/models";
 import { newId, now } from "@/server/utils/ids";
 
 export const isEmailConfigured = () => Boolean(env.resendApiKey && env.emailFrom);
@@ -40,8 +38,8 @@ export async function sendEmail(message: { to: string; subject: string; text: st
  */
 export async function notifyAdmin(entry: { type: string; title: string; body?: string; link?: string }) {
   try {
-    await db.insert(notifications).values({
-      id: newId("ntf"),
+    await Notifications.create({
+      _id: newId("ntf"),
       type: entry.type,
       title: entry.title,
       body: entry.body ?? "",
@@ -60,8 +58,7 @@ export async function notifyAdmin(entry: { type: string; title: string; body?: s
   }
 }
 
-export const listNotifications = (limit = 12) =>
-  db.select().from(notifications).orderBy(desc(notifications.createdAt)).limit(limit);
+export const listNotifications = async (limit = 12) =>
+  plainAll<NotificationRow>(await Notifications.find().sort({ createdAt: -1 }).limit(limit).lean());
 
-export const markNotificationsRead = () =>
-  db.update(notifications).set({ isRead: true }).where(eq(notifications.isRead, false));
+export const markNotificationsRead = () => Notifications.updateMany({ isRead: false }, { $set: { isRead: true } });

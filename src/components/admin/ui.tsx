@@ -100,10 +100,11 @@ export function FilterTabs({
 
 export function PageTitle({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h2 className="type-heading-lg text-charcoal">{title}</h2>
-        {description && <p className="mt-1 text-sm text-mist">{description}</p>}
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-clay/60 pb-6">
+      <div className="min-w-0">
+        {/* Each admin page has exactly one h1: its title. */}
+        <h1 className="type-heading-xl text-charcoal">{title}</h1>
+        {description && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mist">{description}</p>}
       </div>
       {action}
     </div>

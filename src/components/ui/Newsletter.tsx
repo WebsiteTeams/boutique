@@ -48,14 +48,14 @@ export function Newsletter({
       )}
     >
       <div className="max-w-xl">
-        <h3
+        <h2
           className={cn(
             "type-heading-xl text-balance",
             dark ? "text-ivory" : "text-charcoal"
           )}
         >
           Stay Close to the Collection
-        </h3>
+        </h2>
         <p className={cn("mt-3 text-sm leading-relaxed", dark ? "text-ivory/70" : "text-mist")}>
           Be the first to discover new arrivals, festive edits and exclusive boutique
           releases.

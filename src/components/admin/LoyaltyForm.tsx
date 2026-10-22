@@ -83,7 +83,7 @@ export function LoyaltyForm({ settings }: { settings: Settings }) {
           <button
             type="button"
             onClick={() => setForm((f) => ({ ...f, tiers: [...f.tiers, { name: "", minPoints: 0, perk: "" }] }))}
-            className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-gold-deep underline underline-offset-4"
+            className="mt-3 inline-flex min-h-9 items-center gap-1.5 text-xs font-medium text-gold-deep underline underline-offset-4"
           >
             <Plus width={13} height={13} />
             Add tier

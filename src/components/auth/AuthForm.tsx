@@ -136,6 +136,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               </button>
             </span>
           </Field>
+          {!isRegister && (
+            <p className="-mt-2 text-right">
+              <Link
+                href="/forgot-password"
+                className="inline-flex min-h-8 items-center text-sm font-medium text-gold-deep underline underline-offset-4"
+              >
+                Forgot password?
+              </Link>
+            </p>
+          )}
           <Button type="submit" fullWidth disabled={submitting}>
             {submitting ? (
               <>

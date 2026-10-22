@@ -41,13 +41,13 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
         className={cn("group relative flex flex-col", className)}
       >
         <div className="relative overflow-hidden bg-cream">
-          <Link href={`/product/${product.slug}`} className="relative block aspect-[4/5]" aria-label={product.name}>
+          <Link href={`/product/${product.slug}`} className="relative block aspect-[4/5]" tabIndex={-1} aria-hidden>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={product.images[0]}
               alt={product.name}
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out group-hover:opacity-0"
+              className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-luxe [@media(hover:hover)]:group-hover:opacity-0 motion-safe:[@media(hover:hover)]:group-hover:scale-[1.03]"
             />
             {product.images[1] && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -55,7 +55,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
                 src={product.images[1]}
                 alt=""
                 loading="lazy"
-                className="absolute inset-0 h-full w-full scale-[1.02] object-cover opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100"
+                className="absolute inset-0 hidden h-full w-full scale-[1.02] object-cover opacity-0 transition-opacity duration-700 ease-luxe [@media(hover:hover)]:block [@media(hover:hover)]:group-hover:opacity-100"
               />
             )}
 
@@ -132,14 +132,14 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
         </div>
 
         <div className="mt-4 flex flex-col gap-1 px-0.5">
-          <div className="flex items-baseline justify-between gap-2">
+          <h3 className="min-h-[2lh] type-title text-charcoal">
             <Link
               href={`/product/${product.slug}`}
-              className="truncate type-title text-charcoal transition-colors hover:text-gold-deep"
+              className="line-clamp-2 rounded-sm transition-colors duration-200 hover:text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
             >
               {product.name}
             </Link>
-          </div>
+          </h3>
           <p className="type-meta capitalize text-muted">
             {product.fabric} · {product.color}
           </p>

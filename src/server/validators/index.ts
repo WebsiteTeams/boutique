@@ -2,9 +2,6 @@ import { z } from "zod";
 import { SHIPPING_METHODS } from "@/lib/pricing";
 import {
   ALL_ORDER_STATUSES,
-  APPOINTMENT_PURPOSES,
-  APPOINTMENT_SLOTS,
-  APPOINTMENT_STATUSES,
   CONTACT_TOPICS,
   CUSTOM_BLOUSE_STATUSES,
   MESSAGE_STATUSES,
@@ -49,6 +46,15 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   email: emailField,
   password: z.string().min(1, "Required").max(128),
+});
+
+export const passwordResetRequestSchema = z.object({
+  email: emailField,
+});
+
+export const passwordResetSchema = z.object({
+  token: z.string().trim().min(20, "This reset link is invalid.").max(200),
+  password: passwordField,
 });
 
 export const profileSchema = z.object({
@@ -103,10 +109,73 @@ export const savedDesignSchema = z.object({
   options: blouseOptions,
 });
 
+/* ---------------- Custom blouse catalog (admin) ---------------- */
+
+const rupees = z
+  .number({ error: "Enter a price in rupees" })
+  .int("Use whole rupees")
+  .min(0, "Prices can't be negative")
+  .max(1_000_000, "That price is too high");
+
+export const blouseDesignSchema = z
+  .object({
+    name: trimmed(80, 2),
+    slug: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .min(2, "Required")
+      .max(80)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens"),
+    description: trimmed(600).default(""),
+    category: trimmed(60).default(""),
+    image: hostedImage,
+    gallery: z.array(hostedImage).max(8).default([]),
+    price: rupees,
+    isActive: z.boolean(),
+    sortOrder: z.number().int().min(0).max(9999),
+  })
+  .strict();
+
+export const blousePricingSchema = z
+  .object({
+    basePrice: rupees,
+    charges: z
+      .array(
+        z
+          .object({
+            id: z.string().trim().min(1).max(40),
+            label: trimmed(60, 2),
+            amount: rupees,
+            isActive: z.boolean(),
+          })
+          .strict()
+      )
+      .max(10),
+    options: z
+      .array(
+        z
+          .object({
+            groupId: z.string().trim().min(1).max(20),
+            id: z.string().trim().min(1).max(30),
+            name: trimmed(40, 1),
+            price: rupees,
+            isActive: z.boolean(),
+            sortOrder: z.number().int().min(0).max(999),
+          })
+          .strict()
+      )
+      .max(200),
+  })
+  .strict();
+
 /* ---------------- Cart, wishlist, orders ---------------- */
 
 export const customizationSchema = z.object({
   options: blouseOptions,
+  designId: z.string().trim().max(40).nullable().optional(),
+  /** The total the customer saw and confirmed. The server re-prices and refuses if it no longer matches. */
+  expectedPrice: z.number().int().nonnegative().max(10_000_000).optional(),
   measurements: z.object(measurementValues),
   measurementProfile: trimmed(40).optional(),
   instructions: trimmed(1000).optional(),
@@ -120,7 +189,31 @@ const storedCustomization = customizationSchema.extend({
   embroidery: trimmed(40),
   border: trimmed(40),
   stitching: trimmed(40),
+  designId: z.string().trim().max(40).optional(),
+  design: trimmed(80).optional(),
   basePrice: z.number().int().nonnegative(),
+  // Display-only snapshot kept with the bag; the server always re-prices from its own catalog.
+  pricing: z
+    .object({
+      basePrice: z.number().int().nonnegative(),
+      design: z.object({ id: z.string().max(40), name: z.string().max(80), price: z.number().int().nonnegative() }).nullable(),
+      options: z
+        .array(
+          z.object({
+            groupId: z.string().max(20),
+            groupLabel: z.string().max(40),
+            optionId: z.string().max(30),
+            name: z.string().max(40),
+            price: z.number().int().nonnegative(),
+          })
+        )
+        .max(20),
+      charges: z
+        .array(z.object({ id: z.string().max(40), label: z.string().max(60), amount: z.number().int().nonnegative() }))
+        .max(10),
+      total: z.number().int().nonnegative(),
+    })
+    .optional(),
 });
 
 export const cartItemSchema = z.object({
@@ -187,23 +280,6 @@ export const paymentVerifySchema = z.object({
 });
 
 /* ---------------- Boutique services ---------------- */
-
-export const appointmentSchema = z.object({
-  purpose: z.enum(APPOINTMENT_PURPOSES),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a date")
-    .refine((v) => {
-      const today = new Date().toISOString().slice(0, 10);
-      const limit = new Date(Date.now() + 90 * 86_400_000).toISOString().slice(0, 10);
-      return v >= today && v <= limit;
-    }, "Choose a date within the next 90 days"),
-  time: z.enum(APPOINTMENT_SLOTS),
-  name: trimmed(80, 2),
-  phone: phoneField,
-  email: emailField,
-  notes: trimmed(1000).optional().default(""),
-});
 
 export const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
@@ -304,13 +380,6 @@ export const orderUpdateSchema = z.object({
 });
 
 export const customBlouseUpdateSchema = z.object({ status: z.enum(CUSTOM_BLOUSE_STATUSES) });
-
-export const appointmentUpdateSchema = z.object({
-  status: z.enum(APPOINTMENT_STATUSES).optional(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  time: z.enum(APPOINTMENT_SLOTS).optional(),
-  adminNotes: trimmed(1000).optional(),
-});
 
 export const reviewUpdateSchema = z.object({ status: z.enum(REVIEW_STATUSES) });
 export const messageUpdateSchema = z.object({ status: z.enum(MESSAGE_STATUSES) });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal } from "@/components/ui/Modal";
+import { MEASUREMENT_FIELDS } from "@/lib/blouse";
 import { sizeGuideRows } from "@/lib/data";
 
 export function SizeGuide({
@@ -13,13 +14,26 @@ export function SizeGuide({
   return (
     <Modal open={open} onClose={onClose} title="Size Guide" className="max-w-3xl">
       <div className="space-y-6">
-        <div className="overflow-hidden rounded-xl bg-cream">
+        <div className="grid items-center gap-5 rounded-xl bg-cream p-5 sm:grid-cols-[1fr_1fr]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/custom-blouse/size-guide.png"
-            alt="Custom blouse measurement size guide: bust, shoulder, waist, armhole, sleeve length, blouse length and neck depth"
-            className="h-auto w-full object-contain"
+            src="/images/custom-blouse/size-guide.svg"
+            alt="How to measure for a blouse: numbered lines for bust, waist, shoulder, armhole, sleeve length and blouse length"
+            className="mx-auto h-auto w-full max-w-[300px]"
           />
+          <ol className="space-y-2.5">
+            {MEASUREMENT_FIELDS.map((f, i) => (
+              <li key={f.id} className="flex gap-2.5">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[0.62rem] font-bold text-white">
+                  {i + 1}
+                </span>
+                <span>
+                  <span className="block text-sm font-medium text-charcoal">{f.label}</span>
+                  <span className="block text-xs text-mist">{f.hint}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div>

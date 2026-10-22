@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { StorefrontOnly } from "@/components/layout/StorefrontOnly";
 import { siteConfig } from "@/lib/config";
 
 const cormorant = Cormorant_Garamond({
@@ -70,10 +71,14 @@ export default function RootLayout({
           >
             Skip to content
           </a>
-          <Navbar />
+          <StorefrontOnly>
+            <Navbar />
+          </StorefrontOnly>
           <main id="main" className="flex-1">{children}</main>
-          <Footer />
-          <CartDrawer />
+          <StorefrontOnly>
+            <Footer />
+            <CartDrawer />
+          </StorefrontOnly>
         </Providers>
       </body>
     </html>
